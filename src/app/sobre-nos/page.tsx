@@ -1,7 +1,7 @@
 import { MapPinIcon } from "lucide-react"
 import Image from "next/image"
-import Header from "../_components/header"
-import { db } from "../_lib/prisma"
+import Header from "@/components/header"
+import { db } from "@/lib/prisma"
 
 const SobreNosPage = async () => {
   const barbers = await db.barber.findMany({
@@ -42,11 +42,11 @@ const SobreNosPage = async () => {
 
             <div className="space-y-2 border-t border-zinc-800 pt-4">
               <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">
-                Sobre nos
+                Sobre nós
               </h2>
               <p className="text-sm leading-6 text-zinc-300">
                 Somos uma barbearia focada em atendimento próximo, técnica e
-                consistência. Nosso objetivo e entregar cortes, barba e
+                consistência. Nosso objetivo é entregar cortes, barba e
                 acabamento com qualidade para que você saia daqui com visual
                 alinhado e confiança renovada.
               </p>

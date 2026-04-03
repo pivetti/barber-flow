@@ -1,6 +1,6 @@
 import AdminLoginForm from "./admin-login-form"
-import Header from "@/app/_components/header"
-import { resolveSafePath } from "@/app/_lib/safe-redirect"
+import Header from "@/components/header"
+import { resolveSafePath } from "@/lib/safe-redirect"
 
 interface AdminLoginPageProps {
   searchParams?: {

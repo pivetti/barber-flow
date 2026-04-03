@@ -2,11 +2,11 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import Header from "@/app/_components/header"
-import { toBrasiliaWallClock } from "@/app/_lib/brasilia-time"
-import { getAppEnv } from "@/app/_lib/env"
-import { getPublicBookingFromSession } from "@/app/_lib/public-booking-session"
-import ConfirmedBookingActions from "./_components/confirmed-booking-actions"
+import Header from "@/components/header"
+import ConfirmedBookingActions from "@/features/booking/components/confirmed-booking-actions"
+import { toBrasiliaWallClock } from "@/lib/brasilia-time"
+import { getAppEnv } from "@/lib/env"
+import { getPublicBookingFromSession } from "@/lib/public-booking-session"
 
 interface ConfirmedBookingPageProps {
   searchParams?: {

@@ -1,15 +1,15 @@
 import Link from "next/link"
-import AdminHeader from "../_components/admin-header"
-import { changeBarberRole, toggleBarberStatus } from "../_actions/barbers"
-import { Button } from "@/app/_components/ui/button"
+import AdminHeader from "@/features/admin/components/admin-header"
+import { changeBarberRole, toggleBarberStatus } from "@/features/admin/actions/barbers"
+import { Button } from "@/components/ui/button"
 import {
   canEditBarber,
   canChangeBarberRole,
   canManageBarbers,
   canToggleBarberStatus,
-} from "@/app/_lib/admin-permissions"
-import { db } from "@/app/_lib/prisma"
-import { requireAdmin } from "@/app/_lib/require-admin"
+} from "@/lib/admin-permissions"
+import { db } from "@/lib/prisma"
+import { requireAdmin } from "@/lib/require-admin"
 import { redirect } from "next/navigation"
 
 const roleLabelMap = {

@@ -7,8 +7,8 @@ import {
   cancelAdminBookingInline,
   concludeAdminBookingInline,
   deleteAdminBookingInline,
-} from "../_actions/bookings"
-import { Button } from "@/app/_components/ui/button"
+} from "@/features/admin/actions/bookings"
+import { Button } from "@/components/ui/button"
 
 interface BookingCardActionsProps {
   bookingId: string

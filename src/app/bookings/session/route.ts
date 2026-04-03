@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/app/_lib/prisma"
+import { db } from "@/lib/prisma"
 import {
   clearPublicBookingSession,
   createPublicBookingSession,
-} from "@/app/_lib/public-booking-session"
-import { checkRateLimit } from "@/app/_lib/rate-limit"
-import { getRequestIp } from "@/app/_lib/request-ip"
-import { resolveSafePath } from "@/app/_lib/safe-redirect"
+} from "@/lib/public-booking-session"
+import { checkRateLimit } from "@/lib/rate-limit"
+import { getRequestIp } from "@/lib/request-ip"
+import { resolveSafePath } from "@/lib/safe-redirect"
 
 const CANCELLATION_TOKEN_REGEX = /^ct_[a-f0-9]{32}$/i
 

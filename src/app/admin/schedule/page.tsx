@@ -1,18 +1,18 @@
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import AdminHeader from "../_components/admin-header"
+import AdminHeader from "@/features/admin/components/admin-header"
 import {
   addWorkingHour,
   createBlockedTime,
   deleteBlockedTime,
   deleteWorkingHour,
   updateSlotInterval,
-} from "../_actions/schedule"
-import { Button } from "@/app/_components/ui/button"
-import { Input } from "@/app/_components/ui/input"
-import { canManageSchedule } from "@/app/_lib/admin-permissions"
-import { db } from "@/app/_lib/prisma"
-import { requireAdmin } from "@/app/_lib/require-admin"
+} from "@/features/admin/actions/schedule"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { canManageSchedule } from "@/lib/admin-permissions"
+import { db } from "@/lib/prisma"
+import { requireAdmin } from "@/lib/require-admin"
 import { redirect } from "next/navigation"
 
 const weekDays = [

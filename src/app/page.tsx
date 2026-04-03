@@ -3,24 +3,10 @@ import { ptBR } from "date-fns/locale"
 import { InstagramIcon, MapPinIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import Header from "./_components/header"
-import { toBrasiliaWallClock } from "./_lib/brasilia-time"
-import { db } from "./_lib/prisma"
-
-const BARBER_CONTACTS: Record<string, { whatsapp: string; instagram: string }> = {
-  Jesi: {
-    whatsapp: "https://wa.me/5500000000000",
-    instagram: "https://instagram.com/",
-  },
-  Rafael: {
-    whatsapp: "https://wa.me/5500000000000",
-    instagram: "https://instagram.com/",
-  },
-  Lucas: {
-    whatsapp: "https://wa.me/5500000000000",
-    instagram: "https://instagram.com/",
-  },
-}
+import Header from "@/components/header"
+import { BARBER_CONTACTS } from "@/features/barbers/constants/barber-contacts"
+import { toBrasiliaWallClock } from "@/lib/brasilia-time"
+import { db } from "@/lib/prisma"
 
 const Home = async () => {
   const barbers = await db.barber.findMany({
@@ -40,7 +26,7 @@ const Home = async () => {
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
         <section className="space-y-1">
           <h2 className="text-xl font-bold md:text-2xl">
-            Ola, seja bem-vindo!
+            Olá, seja bem-vindo!
           </h2>
 
           <p className="text-sm text-zinc-400">
@@ -88,11 +74,11 @@ const Home = async () => {
 
             <div className="space-y-2 border-t border-zinc-800 pt-4">
               <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-zinc-400">
-                Sobre nos
+                Sobre nós
               </h3>
               <p className="text-sm leading-6 text-zinc-300">
                 Somos uma barbearia focada em atendimento próximo, técnica e
-                consistência. Nosso objetivo e entregar cortes, barba e
+                consistência. Nosso objetivo é entregar cortes, barba e
                 acabamento com qualidade para que você saia daqui com visual
                 alinhado e confiança renovada.
               </p>
@@ -112,13 +98,13 @@ const Home = async () => {
                 key={barber.id}
                 className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70"
               >
-                <div className="relative h-36 w-full sm:h-44">
+                <div className="relative h-36 w-full bg-zinc-950/60 sm:h-44">
                   <Image
                     alt={barber.name}
                     src={barber.imageUrl}
                     fill
                     sizes="(max-width: 768px) 50vw, 33vw"
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </div>
                 <div className="p-3 sm:p-4">

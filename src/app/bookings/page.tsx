@@ -1,6 +1,6 @@
-import BookingTokenManager from "./_components/booking-token-manager"
-import Header from "../_components/header"
-import { db } from "../_lib/prisma"
+import BookingTokenManager from "@/features/booking/components/booking-token-manager"
+import Header from "@/components/header"
+import { db } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 
 interface BookingsPageProps {

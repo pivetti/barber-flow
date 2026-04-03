@@ -3,8 +3,8 @@ import {
   ADMIN_AUTH_COOKIE_NAME,
   adminAuthCookieOptions,
   verifyAdminAuthToken,
-} from "@/app/_lib/admin-auth"
-import { db } from "@/app/_lib/prisma"
+} from "@/lib/admin-auth"
+import { db } from "@/lib/prisma"
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get(ADMIN_AUTH_COOKIE_NAME)?.value

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Input } from "@/app/_components/ui/input"
+import { Input } from "@/components/ui/input"
 
 interface PhoneMaskedInputProps {
   defaultValue: string

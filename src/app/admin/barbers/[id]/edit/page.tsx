@@ -1,12 +1,12 @@
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
-import AdminHeader from "../../../_components/admin-header"
-import { deleteBarber, updateBarber } from "../../../_actions/barbers"
-import { Button } from "@/app/_components/ui/button"
-import { Input } from "@/app/_components/ui/input"
-import { canDeleteBarber, canEditBarber, canManageBarbers } from "@/app/_lib/admin-permissions"
-import { db } from "@/app/_lib/prisma"
-import { requireAdmin } from "@/app/_lib/require-admin"
+import AdminHeader from "@/features/admin/components/admin-header"
+import { deleteBarber, updateBarber } from "@/features/admin/actions/barbers"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { canDeleteBarber, canEditBarber, canManageBarbers } from "@/lib/admin-permissions"
+import { db } from "@/lib/prisma"
+import { requireAdmin } from "@/lib/require-admin"
 
 interface EditBarberPageProps {
   params: {

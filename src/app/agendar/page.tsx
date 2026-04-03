@@ -1,6 +1,6 @@
-import Header from "../_components/header"
-import CustomerIdentificationForm from "./_components/customer-identification-form"
-import { resolveSafePath } from "../_lib/safe-redirect"
+import Header from "@/components/header"
+import CustomerIdentificationForm from "@/features/booking/components/customer-identification-form"
+import { resolveSafePath } from "@/lib/safe-redirect"
 
 interface AgendarPageProps {
   searchParams?: {

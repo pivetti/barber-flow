@@ -2,9 +2,9 @@ import { addDays, format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { ChevronLeft, ChevronRight, Pencil } from "lucide-react"
 import Link from "next/link"
-import AdminHeader from "../_components/admin-header"
+import AdminHeader from "@/features/admin/components/admin-header"
 import BookingCardActions from "./booking-card-actions"
-import { canManageBookings } from "@/app/_lib/admin-permissions"
+import { canManageBookings } from "@/lib/admin-permissions"
 import {
   createUtcDateFromBrasiliaParts,
   getBrasiliaEndOfDay,
@@ -12,10 +12,10 @@ import {
   getBrasiliaTodayStart,
   isSameBrasiliaDay,
   toBrasiliaWallClock,
-} from "@/app/_lib/brasilia-time"
-import { db } from "@/app/_lib/prisma"
-import { requireAdmin } from "@/app/_lib/require-admin"
-import { cn } from "@/app/_lib/utils"
+} from "@/lib/brasilia-time"
+import { db } from "@/lib/prisma"
+import { requireAdmin } from "@/lib/require-admin"
+import { cn } from "@/lib/utils"
 import { redirect } from "next/navigation"
 
 interface DashboardPageProps {

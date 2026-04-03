@@ -1,7 +1,7 @@
-import Header from "../_components/header"
-import BarbersFlow from "./_components/barbers-flow"
-import { db } from "../_lib/prisma"
-import { getSafePublicImagePath } from "../_lib/safe-public-image"
+import Header from "@/components/header"
+import BarbersFlow from "@/features/barbers/components/barbers-flow"
+import { db } from "@/lib/prisma"
+import { getSafePublicImagePath } from "@/lib/safe-public-image"
 
 export const dynamic = "force-dynamic"
 

@@ -1,9 +1,9 @@
 import Link from "next/link"
-import Header from "../_components/header"
-import ServiceItem from "../_components/service-item"
-import { idSchema } from "../_lib/input-validation"
-import { db } from "../_lib/prisma"
-import { getSafePublicImagePath } from "../_lib/safe-public-image"
+import Header from "@/components/header"
+import ServiceItem from "@/features/services/components/service-item"
+import { idSchema } from "@/lib/input-validation"
+import { db } from "@/lib/prisma"
+import { getSafePublicImagePath } from "@/lib/safe-public-image"
 
 interface ServicesPageProps {
   searchParams?: {

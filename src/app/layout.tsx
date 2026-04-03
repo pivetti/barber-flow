@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "sonner"
-import Footer from "./_components/footer"
+import Footer from "@/components/footer"
 
 const inter = Inter({ subsets: ["latin"] })
 

@@ -1,11 +1,11 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import AdminHeader from "../../_components/admin-header"
-import { createBarber } from "../../_actions/barbers"
-import { Button } from "@/app/_components/ui/button"
-import { Input } from "@/app/_components/ui/input"
-import { canManageBarbers } from "@/app/_lib/admin-permissions"
-import { requireAdmin } from "@/app/_lib/require-admin"
+import AdminHeader from "@/features/admin/components/admin-header"
+import { createBarber } from "@/features/admin/actions/barbers"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { canManageBarbers } from "@/lib/admin-permissions"
+import { requireAdmin } from "@/lib/require-admin"
 
 const NewBarberPage = async () => {
   const admin = await requireAdmin()

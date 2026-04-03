@@ -6,9 +6,9 @@ import {
   ADMIN_AUTH_REFRESH_WINDOW_SECONDS,
   adminAuthCookieOptions,
   signAdminAuthToken,
-} from "@/app/_lib/admin-auth"
-import { emailSchema, passwordSchema, sanitizeText } from "@/app/_lib/input-validation"
-import { db } from "@/app/_lib/prisma"
+} from "@/lib/admin-auth"
+import { emailSchema, passwordSchema, sanitizeText } from "@/lib/input-validation"
+import { db } from "@/lib/prisma"
 
 interface AdminLoginBody {
   email?: string
