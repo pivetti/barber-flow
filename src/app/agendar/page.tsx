@@ -1,24 +1,70 @@
 import Header from "@/components/header"
-import CustomerIdentificationForm from "@/features/booking/components/customer-identification-form"
-import { resolveSafePath } from "@/lib/safe-redirect"
+import BookingFlow from "@/features/booking/components/booking-flow"
+import { db } from "@/lib/prisma"
+import { getSafePublicImagePath } from "@/lib/safe-public-image"
 
-interface AgendarPageProps {
-  searchParams?: {
-    next?: string
+export const dynamic = "force-dynamic"
+
+const AgendarPage = async () => {
+  let barbers: Array<{ id: string; name: string; imageUrl: string }> = []
+  let services: Array<{
+    id: string
+    name: string
+    description: string
+    imageUrl: string
+    price: string
+  }> = []
+
+  try {
+    const [barberResult, serviceResult] = await Promise.all([
+      db.barber.findMany({
+        where: {
+          isActive: true,
+        },
+        orderBy: {
+          name: "asc",
+        },
+        select: {
+          id: true,
+          name: true,
+          imageUrl: true,
+        },
+      }),
+      db.service.findMany({
+        orderBy: {
+          name: "asc",
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          imageUrl: true,
+          price: true,
+        },
+      }),
+    ])
+
+    barbers = barberResult.map((barber) => ({
+      id: barber.id,
+      name: barber.name,
+      imageUrl: getSafePublicImagePath(barber.imageUrl, "/logo-jesi.png"),
+    }))
+
+    services = serviceResult.map((service) => ({
+      id: service.id,
+      name: service.name,
+      description: service.description,
+      imageUrl: getSafePublicImagePath(service.imageUrl, "/logo-jesi.png"),
+      price: service.price.toString(),
+    }))
+  } catch (error) {
+    console.error("[agendar-page] failed to load booking flow data", error)
   }
-}
-
-const AgendarPage = ({ searchParams }: AgendarPageProps) => {
-  const nextPath = resolveSafePath(searchParams?.next, {
-    fallback: "/barbers",
-  })
 
   return (
     <>
       <Header />
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-        <CustomerIdentificationForm nextPath={nextPath} />
-      </main>
+      <BookingFlow barbers={barbers} services={services} />
     </>
   )
 }
