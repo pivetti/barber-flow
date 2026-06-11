@@ -3,9 +3,8 @@
 import Image from "next/image"
 import {
   CalendarIcon,
-  HomeIcon,
-  ShieldCheckIcon,
   ScissorsIcon,
+  ShieldCheckIcon,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -31,43 +30,27 @@ const SidebarSheet = () => {
               Barbearia do Jesi
             </SheetTitle>
             <SheetDescription className="sr-only">
-              Menu de navegação com links principais.
+              Menu de navegacao com links principais.
             </SheetDescription>
-            <p className="text-left text-xs text-zinc-400">Navegação rápida</p>
+            <p className="text-left text-xs text-zinc-400">Navegacao rapida</p>
           </div>
         </div>
       </SheetHeader>
 
       <div className="space-y-6 p-5">
-        <section aria-label="Navegação principal" className="space-y-2">
+        <section aria-label="Navegacao principal" className="space-y-2">
           <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
-            Navegação
+            Navegacao
           </p>
 
           <SheetClose asChild>
             <Link
-              href="/"
-              aria-label="Ir para início"
+              href="/#agendamento"
+              aria-label="Ir para agendamento"
               className={cn(
                 "group flex h-11 items-center gap-3 rounded-2xl border px-4 text-sm font-medium transition-colors",
-                pathname === "/"
+                pathname === "/" || pathname.startsWith("/agendar")
                   ? "border-violet-500/40 bg-violet-500/15 text-violet-200"
-                  : "border-zinc-800 bg-zinc-900/70 text-zinc-200 hover:border-zinc-700 hover:bg-zinc-900",
-              )}
-            >
-              <HomeIcon className="h-4 w-4" />
-              <span className="flex-1">Início</span>
-            </Link>
-          </SheetClose>
-
-          <SheetClose asChild>
-            <Link
-              href="/agendar"
-              aria-label="Ir para agendar"
-              className={cn(
-                "group flex h-11 items-center gap-3 rounded-2xl border px-4 text-sm font-semibold transition-colors",
-                pathname.startsWith("/agendar") || pathname.startsWith("/barbers") || pathname.startsWith("/services")
-                  ? "border-violet-500/40 bg-violet-500/20 text-violet-100"
                   : "border-zinc-800 bg-zinc-900/70 text-zinc-200 hover:border-zinc-700 hover:bg-zinc-900",
               )}
             >
@@ -93,7 +76,7 @@ const SidebarSheet = () => {
           </SheetClose>
         </section>
 
-        <section aria-label="Área administrativa" className="space-y-2 border-t border-zinc-800 pt-5">
+        <section aria-label="Area administrativa" className="space-y-2 border-t border-zinc-800 pt-5">
           <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
             Admin
           </p>

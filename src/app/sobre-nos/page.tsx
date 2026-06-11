@@ -3,6 +3,8 @@ import Image from "next/image"
 import Header from "@/components/header"
 import { db } from "@/lib/prisma"
 
+export const dynamic = "force-dynamic"
+
 const SobreNosPage = async () => {
   const barbers = await db.barber.findMany({
     where: {

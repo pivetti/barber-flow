@@ -17,6 +17,7 @@ import {
   CalendarDays,
   Check,
   CheckCircle2,
+  ChevronRight,
   Clock3,
   Loader2,
   Phone,
@@ -267,6 +268,109 @@ const StepShell = ({
   </section>
 )
 
+const CheckoutProgress = ({
+  steps,
+}: {
+  steps: Array<{
+    label: string
+    isActive: boolean
+    isComplete: boolean
+  }>
+}) => (
+  <div className="rounded-lg border border-zinc-800 bg-zinc-950/30 p-3">
+    <div className="flex items-center gap-2">
+      {steps.map((step, index) => (
+        <div key={step.label} className="flex min-w-0 flex-1 items-center gap-2">
+          <span
+            className={cn(
+              "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-bold transition-colors",
+              step.isComplete
+                ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-200"
+                : step.isActive
+                  ? "border-violet-400 bg-violet-500 text-white"
+                  : "border-zinc-700 bg-zinc-900 text-zinc-500",
+            )}
+          >
+            {step.isComplete ? <Check className="h-3.5 w-3.5" /> : index + 1}
+          </span>
+          <span
+            className={cn(
+              "hidden min-w-0 truncate text-xs font-semibold sm:block",
+              step.isActive || step.isComplete ? "text-zinc-100" : "text-zinc-500",
+            )}
+          >
+            {step.label}
+          </span>
+          {index < steps.length - 1 && (
+            <span
+              className={cn(
+                "h-px flex-1 rounded-full",
+                step.isComplete ? "bg-emerald-500/45" : "bg-zinc-800",
+              )}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)
+
+const CollapsedStepCard = ({
+  id,
+  number,
+  title,
+  summary,
+  isComplete,
+  isEnabled,
+  onOpen,
+}: {
+  id: FlowStepId
+  number: string
+  title: string
+  summary: string
+  isComplete: boolean
+  isEnabled: boolean
+  onOpen: Dispatch<FlowStepId>
+}) => (
+  <button
+    id={`booking-${id}`}
+    type="button"
+    disabled={!isEnabled}
+    onClick={() => onOpen(id)}
+    className={cn(
+      "flex w-full scroll-mt-24 items-center gap-3 rounded-lg border bg-zinc-900/35 p-3 text-left transition-colors",
+      isEnabled
+        ? "border-zinc-800 hover:border-violet-400/45 hover:bg-zinc-900/65"
+        : "cursor-not-allowed border-zinc-900 bg-zinc-950/30 opacity-65",
+      isComplete && "border-emerald-500/25 bg-emerald-500/5",
+    )}
+  >
+    <span
+      className={cn(
+        "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold",
+        isComplete
+          ? "border-emerald-400/35 bg-emerald-500/15 text-emerald-200"
+          : "border-zinc-700 bg-zinc-950 text-zinc-500",
+      )}
+    >
+      {isComplete ? <Check className="h-4 w-4" /> : number}
+    </span>
+    <span className="min-w-0 flex-1">
+      <span className="block truncate text-sm font-semibold text-zinc-100">{title}</span>
+      <span className="mt-0.5 block truncate text-xs text-zinc-500">{summary}</span>
+    </span>
+    <span
+      className={cn(
+        "hidden shrink-0 items-center gap-1 text-xs font-semibold sm:inline-flex",
+        isEnabled ? "text-violet-200" : "text-zinc-600",
+      )}
+    >
+      {isComplete ? "Editar" : "Abrir"}
+      <ChevronRight className="h-3.5 w-3.5" />
+    </span>
+  </button>
+)
+
 const CustomerStep = ({
   profile,
   customerError,
@@ -396,13 +500,13 @@ const BarberStep = ({
                   : "border-zinc-800",
               )}
             >
-              <span className="relative block h-36 bg-zinc-950 sm:h-40">
+              <span className="relative block h-24 bg-zinc-950 sm:h-28">
                 <Image
                   src={barber.imageUrl}
                   alt={barber.name}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                  className="object-contain p-3 transition-transform duration-200 group-hover:scale-[1.02]"
+                  className="object-contain p-2.5 transition-transform duration-200 group-hover:scale-[1.02]"
                 />
                 {isSelected && (
                   <span className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white">
@@ -466,7 +570,7 @@ const ServiceStep = ({
         Escolha um barbeiro para liberar os servicos.
       </p>
     ) : services.length > 0 ? (
-      <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
         {services.map((service) => {
           const isSelected = selectedServiceId === service.id
           const serviceImageUrl = getServiceImageUrl(service.name, service.imageUrl)
@@ -478,16 +582,16 @@ const ServiceStep = ({
               onClick={() => onSelectService(service.id)}
               aria-pressed={isSelected}
               className={cn(
-                "grid grid-cols-[72px_1fr] gap-3 rounded-lg border bg-zinc-950/45 p-3 text-left transition-colors hover:border-violet-400/50 hover:bg-zinc-900",
+                "grid grid-cols-[56px_1fr] gap-3 rounded-lg border bg-zinc-950/45 p-3 text-left transition-colors hover:border-violet-400/50 hover:bg-zinc-900 sm:grid-cols-[64px_1fr]",
                 isSelected ? "border-violet-400 bg-violet-500/10" : "border-zinc-800",
               )}
             >
-              <span className="relative h-[72px] w-[72px] overflow-hidden rounded-lg bg-zinc-900">
+              <span className="relative h-14 w-14 overflow-hidden rounded-lg bg-zinc-900 sm:h-16 sm:w-16">
                 <Image
                   src={serviceImageUrl}
                   alt={service.name}
                   fill
-                  sizes="72px"
+                  sizes="64px"
                   className="object-cover"
                 />
               </span>
@@ -545,7 +649,7 @@ const DateTimeStep = ({
 }) => (
   <StepShell
     id="datetime"
-    eyebrow="Etapas 04 e 05"
+    eyebrow="Etapa 04"
     title="Data e horario"
     description="Escolha uma data valida e depois um horario livre na agenda."
     isActive={isActive}
@@ -557,7 +661,7 @@ const DateTimeStep = ({
         Escolha barbeiro e servico para liberar a agenda.
       </p>
     ) : (
-      <div className="grid gap-4 xl:grid-cols-[360px_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
         <div className="rounded-lg border border-zinc-800 bg-zinc-950/35 p-3">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-100">
             <CalendarDays className="h-4 w-4 text-violet-200" />
@@ -594,16 +698,16 @@ const DateTimeStep = ({
           </div>
 
           {!selectedDay ? (
-            <div className="flex min-h-[180px] items-center justify-center rounded-lg border border-dashed border-zinc-800 px-4 text-center text-sm text-zinc-500">
+            <div className="flex min-h-[136px] items-center justify-center rounded-lg border border-dashed border-zinc-800 px-4 text-center text-sm text-zinc-500">
               Selecione uma data para ver os horarios disponiveis.
             </div>
           ) : dayContextStatus === "loading" ? (
-            <div className="flex min-h-[180px] flex-col items-center justify-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/45 px-4 text-center text-sm text-zinc-400">
+            <div className="flex min-h-[136px] flex-col items-center justify-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/45 px-4 text-center text-sm text-zinc-400">
               <Loader2 className="h-5 w-5 animate-spin text-violet-200" />
               Buscando horarios livres...
             </div>
           ) : dayContextStatus === "error" ? (
-            <div className="flex min-h-[180px] items-center justify-center rounded-lg border border-red-500/25 bg-red-500/10 px-4 text-center text-sm text-red-200">
+            <div className="flex min-h-[136px] items-center justify-center rounded-lg border border-red-500/25 bg-red-500/10 px-4 text-center text-sm text-red-200">
               Nao foi possivel carregar os horarios agora. Tente novamente em instantes.
             </div>
           ) : timeList.length > 0 ? (
@@ -634,7 +738,7 @@ const DateTimeStep = ({
               ))}
             </div>
           ) : (
-            <div className="flex min-h-[180px] items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/45 px-4 text-center text-sm text-zinc-400">
+            <div className="flex min-h-[136px] items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/45 px-4 text-center text-sm text-zinc-400">
               Sem horarios disponiveis para esta data.
             </div>
           )}
@@ -648,16 +752,24 @@ const SummaryRow = ({
   label,
   value,
   isReady,
+  compact,
 }: {
   label: string
   value: string
   isReady: boolean
+  compact?: boolean
 }) => (
-  <div className="flex items-start justify-between gap-4 border-b border-zinc-800/80 py-3 last:border-b-0">
-    <span className="text-sm text-zinc-500">{label}</span>
+  <div
+    className={cn(
+      "flex items-start justify-between gap-4 border-b border-zinc-800/80 last:border-b-0",
+      compact ? "py-2" : "py-3",
+    )}
+  >
+    <span className={cn("text-zinc-500", compact ? "text-xs" : "text-sm")}>{label}</span>
     <span
       className={cn(
-        "min-w-0 text-right text-sm font-semibold",
+        "min-w-0 text-right font-semibold",
+        compact ? "text-xs" : "text-sm",
         isReady ? "text-zinc-100" : "text-zinc-500",
       )}
     >
@@ -675,6 +787,7 @@ const BookingResumeCard = ({
   customerIsValid,
   flowError,
   isCreatingBooking,
+  compact,
   onConfirm,
 }: {
   profile: CustomerProfile
@@ -685,6 +798,7 @@ const BookingResumeCard = ({
   customerIsValid: boolean
   flowError: string | null
   isCreatingBooking: boolean
+  compact?: boolean
   onConfirm: () => void
 }) => {
   const bookingIsReady = Boolean(customerIsValid && selectedBarber && selectedService && selectedDate)
@@ -692,14 +806,19 @@ const BookingResumeCard = ({
 
   return (
     <aside
-      className="rounded-lg border border-zinc-800 bg-zinc-900/70 p-4 shadow-xl shadow-black/20 sm:p-5"
+      className={cn(
+        "rounded-lg border border-zinc-800 bg-zinc-900/70 shadow-xl shadow-black/20",
+        compact ? "p-3" : "p-4 sm:p-5",
+      )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200/85">
-            Etapa 06
+            Etapa 05
           </p>
-          <h2 className="mt-1 text-lg font-bold text-zinc-50">Resumo</h2>
+          <h2 className={cn("mt-1 font-bold text-zinc-50", compact ? "text-base" : "text-lg")}>
+            Resumo
+          </h2>
         </div>
         <span
           className={cn(
@@ -714,32 +833,39 @@ const BookingResumeCard = ({
         </span>
       </div>
 
-      <div className="mt-5 rounded-lg border border-zinc-800 bg-zinc-950/35 px-3">
+      <div className={cn("rounded-lg border border-zinc-800 bg-zinc-950/35 px-3", compact ? "mt-3" : "mt-5")}>
         <SummaryRow
           label="Cliente"
           value={customerIsValid ? normalizeCustomerProfile(profile).name : "Aguardando"}
           isReady={customerIsValid}
+          compact={compact}
         />
-        <SummaryRow
-          label="Telefone"
-          value={customerIsValid ? formatPhone(normalizeCustomerProfile(profile).phone) : "Aguardando"}
-          isReady={customerIsValid}
-        />
+        {!compact && (
+          <SummaryRow
+            label="Telefone"
+            value={customerIsValid ? formatPhone(normalizeCustomerProfile(profile).phone) : "Aguardando"}
+            isReady={customerIsValid}
+          />
+        )}
         <SummaryRow
           label="Barbeiro"
           value={selectedBarber?.name ?? "Aguardando"}
           isReady={Boolean(selectedBarber)}
+          compact={compact}
         />
         <SummaryRow
           label="Servico"
           value={selectedService?.name ?? "Aguardando"}
           isReady={Boolean(selectedService)}
+          compact={compact}
         />
-        <SummaryRow
-          label="Valor"
-          value={servicePrice ?? "Aguardando"}
-          isReady={Boolean(servicePrice)}
-        />
+        {!compact && (
+          <SummaryRow
+            label="Valor"
+            value={servicePrice ?? "Aguardando"}
+            isReady={Boolean(servicePrice)}
+          />
+        )}
         <SummaryRow
           label="Data"
           value={
@@ -750,11 +876,13 @@ const BookingResumeCard = ({
                 : "Aguardando"
           }
           isReady={Boolean(selectedDate)}
+          compact={compact}
         />
         <SummaryRow
           label="Horario"
           value={selectedDate ? format(selectedDate, "HH:mm") : "Aguardando"}
           isReady={Boolean(selectedDate)}
+          compact={compact}
         />
       </div>
 
@@ -768,7 +896,10 @@ const BookingResumeCard = ({
         type="button"
         onClick={onConfirm}
         disabled={!bookingIsReady || isCreatingBooking}
-        className="mt-5 h-12 w-full gap-2 rounded-lg bg-violet-500 text-sm font-bold text-white hover:bg-violet-400"
+        className={cn(
+          "w-full gap-2 rounded-lg bg-violet-500 text-sm font-bold text-white hover:bg-violet-400",
+          compact ? "mt-3 h-11" : "mt-5 h-12",
+        )}
       >
         {isCreatingBooking ? (
           <>
@@ -783,7 +914,7 @@ const BookingResumeCard = ({
         )}
       </Button>
 
-      <p className="mt-3 text-center text-xs leading-relaxed text-zinc-500">
+      <p className={cn("text-center text-xs leading-relaxed text-zinc-500", compact ? "mt-2" : "mt-3")}>
         A reserva sera criada somente apos a confirmacao.
       </p>
     </aside>
@@ -846,6 +977,86 @@ const BookingFlow = ({
 
     return getTimeList(selectedDay, availableTimes)
   }, [availableTimes, selectedDay])
+
+  const checkoutSteps = useMemo(
+    () => [
+      {
+        id: "customer" as const,
+        number: "01",
+        title: "Seus dados",
+        summary: customerIsValid ? normalizedProfile.name : "Nome e telefone com DDD",
+        isComplete: customerIsValid,
+        isEnabled: true,
+      },
+      {
+        id: "barber" as const,
+        number: "02",
+        title: "Barbeiro",
+        summary: selectedBarber?.name ?? "Escolha o profissional",
+        isComplete: Boolean(selectedBarber),
+        isEnabled: customerIsValid,
+      },
+      {
+        id: "service" as const,
+        number: "03",
+        title: "Servico",
+        summary: selectedService?.name ?? "Escolha o servico",
+        isComplete: Boolean(selectedService),
+        isEnabled: customerIsValid && Boolean(selectedBarber),
+      },
+      {
+        id: "datetime" as const,
+        number: "04",
+        title: "Data e horario",
+        summary: selectedDate
+          ? `${format(selectedDate, "dd/MM", { locale: ptBR })} as ${format(selectedDate, "HH:mm")}`
+          : selectedDay
+            ? "Escolha um horario"
+            : "Escolha data e horario",
+        isComplete: Boolean(selectedDate),
+        isEnabled: customerIsValid && Boolean(selectedBarber) && Boolean(selectedService),
+      },
+    ],
+    [
+      customerIsValid,
+      normalizedProfile.name,
+      selectedBarber,
+      selectedDate,
+      selectedDay,
+      selectedService,
+    ],
+  )
+
+  const progressSteps = useMemo(
+    () => [
+      {
+        label: "Cliente",
+        isActive: activeStep === "customer",
+        isComplete: customerIsValid,
+      },
+      {
+        label: "Barbeiro",
+        isActive: activeStep === "barber",
+        isComplete: Boolean(selectedBarber),
+      },
+      {
+        label: "Servico",
+        isActive: activeStep === "service",
+        isComplete: Boolean(selectedService),
+      },
+      {
+        label: "Data e hora",
+        isActive: activeStep === "datetime",
+        isComplete: Boolean(selectedDate),
+      },
+      {
+        label: "Confirmar",
+        isActive: activeStep === "resume",
+        isComplete: false,
+      },
+    ],
+    [activeStep, customerIsValid, selectedBarber, selectedDate, selectedService],
+  )
 
   useEffect(() => {
     const savedProfile = parseCustomerProfile(
@@ -999,6 +1210,26 @@ const BookingFlow = ({
     setSelectedTime(time)
     setFlowError(null)
     setActiveStep("resume")
+
+    if (!window.matchMedia("(min-width: 768px)").matches) {
+      window.requestAnimationFrame(() => {
+        document.getElementById("booking-resume-mobile")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        })
+      })
+    }
+  }
+
+  const handleOpenStep = (stepId: FlowStepId) => {
+    const step = checkoutSteps.find((item) => item.id === stepId)
+
+    if (!step?.isEnabled) {
+      return
+    }
+
+    setActiveStep(stepId)
+    scrollToStep(stepId)
   }
 
   const getValidationMessage = () => {
@@ -1088,33 +1319,30 @@ const BookingFlow = ({
     })
   }
 
-  const RootElement = rootElement
+  const renderCheckoutStep = (step: (typeof checkoutSteps)[number]) => {
+    if (activeStep !== step.id) {
+      return (
+        <CollapsedStepCard
+          key={step.id}
+          id={step.id}
+          number={step.number}
+          title={step.title}
+          summary={step.summary}
+          isComplete={step.isComplete}
+          isEnabled={step.isEnabled}
+          onOpen={handleOpenStep}
+        />
+      )
+    }
 
-  return (
-    <RootElement
-      id={id}
-      className={cn("mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8", className)}
-    >
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200/85">
-            Agendamento
-          </p>
-          <h1 className="mt-2 text-2xl font-bold leading-tight text-zinc-50 sm:text-3xl">
-            Reserve seu horario em poucos passos
-          </h1>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-            Complete as escolhas na esquerda e acompanhe o resumo antes de confirmar.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_340px] md:items-start xl:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="min-w-0 space-y-4">
+    switch (step.id) {
+      case "customer":
+        return (
           <CustomerStep
+            key={step.id}
             profile={profile}
             customerError={customerError}
-            isActive={activeStep === "customer"}
+            isActive
             isComplete={customerIsValid}
             onChange={(nextProfile) => {
               setProfile(nextProfile)
@@ -1123,38 +1351,79 @@ const BookingFlow = ({
             }}
             onSubmit={handleCustomerSubmit}
           />
-
+        )
+      case "barber":
+        return (
           <BarberStep
+            key={step.id}
             barbers={barbers}
             selectedBarberId={selectedBarberId}
-            isActive={activeStep === "barber"}
+            isActive
             isComplete={Boolean(selectedBarber)}
             isDisabled={!customerIsValid}
             onSelectBarber={handleSelectBarber}
           />
-
+        )
+      case "service":
+        return (
           <ServiceStep
+            key={step.id}
             services={services}
             selectedServiceId={selectedServiceId}
-            isActive={activeStep === "service"}
+            isActive
             isComplete={Boolean(selectedService)}
             isDisabled={!customerIsValid || !selectedBarber}
             onSelectService={handleSelectService}
           />
-
+        )
+      case "datetime":
+        return (
           <DateTimeStep
+            key={step.id}
             selectedDay={selectedDay}
             selectedTime={selectedTime}
             selectedBarber={selectedBarber}
             dayContextStatus={dayContextStatus}
             timeList={timeList}
             maxBookingDate={maxBookingDate}
-            isActive={activeStep === "datetime"}
+            isActive
             isComplete={Boolean(selectedDate)}
             isDisabled={!customerIsValid || !selectedBarber || !selectedService}
             onSelectDay={handleSelectDay}
             onSelectTime={handleSelectTime}
           />
+        )
+      default:
+        return null
+    }
+  }
+
+  const RootElement = rootElement
+
+  return (
+    <RootElement
+      id={id}
+      className={cn("mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8", className)}
+    >
+      <div className="mb-4 flex flex-col gap-2">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200/85">
+            Agendamento
+          </p>
+          <h1 className="mt-1 text-xl font-bold leading-tight text-zinc-50 sm:text-2xl">
+            Reserve seu horario
+          </h1>
+          <p className="mt-1 text-sm leading-relaxed text-zinc-400">
+            Complete uma etapa por vez e confirme no resumo.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_340px] md:items-start xl:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0 space-y-3">
+          <CheckoutProgress steps={progressSteps} />
+
+          {checkoutSteps.map((step) => renderCheckoutStep(step))}
 
           <div id="booking-resume-mobile" className="scroll-mt-24 md:hidden">
             <BookingResumeCard
@@ -1166,6 +1435,7 @@ const BookingFlow = ({
               customerIsValid={customerIsValid}
               flowError={flowError}
               isCreatingBooking={isCreatingBooking}
+              compact
               onConfirm={handleCreateBooking}
             />
           </div>

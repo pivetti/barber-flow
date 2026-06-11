@@ -10,7 +10,7 @@ import Image from "next/image"
 const Header = () => {
   return (
     <header className="border-b border-zinc-800/80 bg-gradient-to-b from-black/70 to-zinc-950/70 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 sm:px-6 sm:py-3">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 sm:px-6 sm:py-3 xl:max-w-7xl">
         <Link href="/" className="group leading-none">
           <Image
             src="/logo-jesi.png"
