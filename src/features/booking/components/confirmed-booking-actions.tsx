@@ -99,7 +99,7 @@ const ConfirmedBookingActions = ({
         </p>
         {whatsappBlocked && (
           <p className="max-w-sm rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
-            Se o WhatsApp nao abriu automaticamente, toque no botao abaixo.
+            Se o WhatsApp nao abriu automaticamente, toque no botao acima.
           </p>
         )}
       </div>
