@@ -4,10 +4,11 @@ import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { CalendarDays, Pencil } from "lucide-react"
 import Link from "next/link"
-import { useMemo, useState, useTransition } from "react"
+import { useMemo, useRef, useState, useTransition } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 import BookingCardActions from "./booking-card-actions"
+import type { OptimisticStatusChangePayload } from "./booking-card-actions"
 import { getAdminDashboardMonthBookings } from "@/features/admin/actions/dashboard"
 
 interface DashboardBooking {
@@ -17,6 +18,7 @@ interface DashboardBooking {
   status: string
   cancellationRequested: boolean
   customerName: string
+  customerPhone: string
   serviceName: string
 }
 
@@ -72,16 +74,21 @@ const AdminDashboardCalendar = ({
   const [visibleMonth, setVisibleMonth] = useState(() => parseDateKey(initialDateKey))
   const [monthBookings, setMonthBookings] = useState(bookings)
   const [loadError, setLoadError] = useState("")
+  const statusRollbackBookingsRef = useRef(new Map<string, DashboardBooking>())
   const [, startTransition] = useTransition()
   const selectedDate = useMemo(() => parseDateKey(selectedDateKey), [selectedDateKey])
   const today = useMemo(() => parseDateKey(todayKey), [todayKey])
+  const visibleMonthBookings = useMemo(
+    () => monthBookings.filter((booking) => booking.status !== "CANCELED"),
+    [monthBookings],
+  )
 
   const bookingCountByDate = useMemo(() => {
-    return monthBookings.reduce<Record<string, number>>((result, booking) => {
+    return visibleMonthBookings.reduce<Record<string, number>>((result, booking) => {
       result[booking.dateKey] = (result[booking.dateKey] ?? 0) + 1
       return result
     }, {})
-  }, [monthBookings])
+  }, [visibleMonthBookings])
 
   const bookedDays = useMemo(
     () => Object.keys(bookingCountByDate).map(parseDateKey),
@@ -90,10 +97,10 @@ const AdminDashboardCalendar = ({
 
   const selectedBookings = useMemo(
     () =>
-      monthBookings
+      visibleMonthBookings
         .filter((booking) => booking.dateKey === selectedDateKey)
         .sort((left, right) => left.time.localeCompare(right.time)),
-    [monthBookings, selectedDateKey],
+    [visibleMonthBookings, selectedDateKey],
   )
 
   const selectedDateLabel =
@@ -104,6 +111,7 @@ const AdminDashboardCalendar = ({
   const loadMonth = (month: Date) => {
     const nextDateKey = getDateKey(month)
 
+    statusRollbackBookingsRef.current.clear()
     setVisibleMonth(month)
     setSelectedDateKey(nextDateKey)
     setLoadError("")
@@ -129,6 +137,49 @@ const AdminDashboardCalendar = ({
     }
 
     loadMonth(today)
+  }
+
+  const handleOptimisticStatusChange = ({
+    bookingId,
+    status,
+  }: OptimisticStatusChangePayload) => {
+    setMonthBookings((currentBookings) => {
+      const previousBooking = currentBookings.find((booking) => booking.id === bookingId)
+
+      if (previousBooking) {
+        statusRollbackBookingsRef.current.set(bookingId, previousBooking)
+      }
+
+      return currentBookings.map((booking) =>
+        booking.id === bookingId
+          ? {
+              ...booking,
+              status,
+              cancellationRequested: false,
+            }
+          : booking,
+      )
+    })
+  }
+
+  const handleStatusChangeSuccess = (bookingId: string) => {
+    statusRollbackBookingsRef.current.delete(bookingId)
+  }
+
+  const handleStatusChangeError = (bookingId: string) => {
+    const bookingToRestore = statusRollbackBookingsRef.current.get(bookingId)
+
+    statusRollbackBookingsRef.current.delete(bookingId)
+
+    if (!bookingToRestore) {
+      return
+    }
+
+    setMonthBookings((currentBookings) =>
+      currentBookings.map((booking) =>
+        booking.id === bookingToRestore.id ? bookingToRestore : booking,
+      ),
+    )
   }
 
   return (
@@ -263,7 +314,14 @@ const AdminDashboardCalendar = ({
                   </div>
 
                   <div className="flex border-t border-zinc-800/70 pt-2.5">
-                    <BookingCardActions bookingId={booking.id} />
+                    <BookingCardActions
+                      bookingId={booking.id}
+                      customerName={booking.customerName}
+                      customerPhone={booking.customerPhone}
+                      onOptimisticStatusChange={handleOptimisticStatusChange}
+                      onStatusChangeError={handleStatusChangeError}
+                      onStatusChangeSuccess={handleStatusChangeSuccess}
+                    />
                   </div>
                 </div>
               </article>

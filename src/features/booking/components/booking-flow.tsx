@@ -186,13 +186,21 @@ const getTimeList = (selectedDay: Date, availableTimes: string[]): TimeSlot[] =>
   })
 }
 
-const scrollToStep = (stepId: FlowStepId) => {
+const getPreferredScrollBehavior = (): ScrollBehavior => {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+}
+
+const scrollToElement = (elementId: string) => {
   window.requestAnimationFrame(() => {
-    document.getElementById(`booking-${stepId}`)?.scrollIntoView({
-      behavior: "smooth",
+    document.getElementById(elementId)?.scrollIntoView({
+      behavior: getPreferredScrollBehavior(),
       block: "start",
     })
   })
+}
+
+const scrollToStep = (stepId: FlowStepId) => {
+  scrollToElement(`booking-${stepId}`)
 }
 
 const SectionStatus = ({
@@ -1212,12 +1220,7 @@ const BookingFlow = ({
     setActiveStep("resume")
 
     if (!window.matchMedia("(min-width: 768px)").matches) {
-      window.requestAnimationFrame(() => {
-        document.getElementById("booking-resume-mobile")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        })
-      })
+      scrollToElement("booking-resume-mobile")
     }
   }
 
@@ -1403,7 +1406,11 @@ const BookingFlow = ({
   return (
     <RootElement
       id={id}
-      className={cn("mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-8", className)}
+      className={cn(
+        "mx-auto w-full max-w-7xl scroll-mt-24 px-4 py-6 sm:px-6 lg:py-8",
+        className,
+        "pb-[calc(2rem+env(safe-area-inset-bottom))]",
+      )}
     >
       <div className="mb-4 flex flex-col gap-2">
         <div className="max-w-2xl">
@@ -1425,7 +1432,7 @@ const BookingFlow = ({
 
           {checkoutSteps.map((step) => renderCheckoutStep(step))}
 
-          <div id="booking-resume-mobile" className="scroll-mt-24 md:hidden">
+          <div id="booking-resume-mobile" className="scroll-mt-24 pb-6 md:hidden">
             <BookingResumeCard
               profile={profile}
               selectedBarber={selectedBarber}

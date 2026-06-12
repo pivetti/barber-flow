@@ -1,91 +1,176 @@
 "use client"
 
+import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
-import { Ban, CheckCircle2, Trash2 } from "lucide-react"
+import { useRef, useState, type Dispatch } from "react"
+import { Ban, CheckCircle2, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import {
   cancelAdminBookingInline,
   concludeAdminBookingInline,
-  deleteAdminBookingInline,
 } from "@/features/admin/actions/bookings"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 interface BookingCardActionsProps {
   bookingId: string
+  customerName: string
+  customerPhone: string
+  onOptimisticStatusChange: Dispatch<OptimisticStatusChangePayload>
+  onStatusChangeError: Dispatch<string>
+  onStatusChangeSuccess: Dispatch<string>
 }
 
-type PendingAction = "conclude" | "cancel" | "delete" | null
+export type BookingCardAction = "conclude" | "cancel"
 
-const BookingCardActions = ({ bookingId }: BookingCardActionsProps) => {
+export interface OptimisticStatusChangePayload {
+  bookingId: string
+  status: "CANCELED" | "DONE"
+}
+
+type PendingAction = BookingCardAction | null
+
+const actionConfig = {
+  conclude: {
+    label: "Concluir",
+    pendingLabel: "Concluindo...",
+    successMessage: "Agendamento concluido.",
+    errorMessage: "Nao foi possivel concluir o agendamento. Tente novamente.",
+    Icon: CheckCircle2,
+    run: concludeAdminBookingInline,
+  },
+  cancel: {
+    label: "Cancelar",
+    pendingLabel: "Cancelando...",
+    successMessage: "Agendamento cancelado.",
+    errorMessage: "Nao foi possivel cancelar o agendamento. Tente novamente.",
+    Icon: Ban,
+    run: cancelAdminBookingInline,
+  },
+} satisfies Record<
+  BookingCardAction,
+  {
+    label: string
+    pendingLabel: string
+    successMessage: string
+    errorMessage: string
+    Icon: typeof CheckCircle2
+    run: typeof concludeAdminBookingInline
+  }
+>
+
+const getWhatsAppUrl = (phone: string) => {
+  const digits = phone.replace(/\D/g, "")
+  const normalized = digits.startsWith("55") ? digits : `55${digits}`
+  return `https://wa.me/${normalized}`
+}
+
+const BookingCardActions = ({
+  bookingId,
+  customerName,
+  customerPhone,
+  onOptimisticStatusChange,
+  onStatusChangeError,
+  onStatusChangeSuccess,
+}: BookingCardActionsProps) => {
   const router = useRouter()
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
-  const [isPending, startTransition] = useTransition()
+  const pendingActionRef = useRef<PendingAction>(null)
+  const whatsappUrl = getWhatsAppUrl(customerPhone)
 
-  const handleAction = (action: PendingAction) => {
-    if (!action) {
+  const handleAction = async (action: BookingCardAction) => {
+    if (pendingActionRef.current) {
       return
     }
 
-    startTransition(async () => {
-      setPendingAction(action)
+    const { errorMessage, run, successMessage } = actionConfig[action]
 
-      try {
-        const result =
-          action === "conclude"
-            ? await concludeAdminBookingInline(bookingId)
-            : action === "cancel"
-              ? await cancelAdminBookingInline(bookingId)
-              : await deleteAdminBookingInline(bookingId)
+    pendingActionRef.current = action
+    setPendingAction(action)
 
-        if (result.ok) {
-          router.refresh()
-        }
-      } finally {
-        setPendingAction(null)
+    if (action === "conclude") {
+      onOptimisticStatusChange({ bookingId, status: "DONE" })
+    }
+
+    if (action === "cancel") {
+      onOptimisticStatusChange({ bookingId, status: "CANCELED" })
+    }
+
+    try {
+      const result = await run(bookingId)
+
+      if (!result.ok) {
+        throw new Error("Admin booking action failed")
       }
-    })
+
+      onStatusChangeSuccess(bookingId)
+
+      toast.success(successMessage)
+      router.refresh()
+    } catch {
+      onStatusChangeError(bookingId)
+      toast.error(errorMessage)
+    } finally {
+      pendingActionRef.current = null
+      setPendingAction(null)
+    }
+  }
+
+  const renderActionButton = (action: BookingCardAction) => {
+    const { Icon, label, pendingLabel } = actionConfig[action]
+    const isActionPending = pendingAction === action
+    const isAnyActionPending = pendingAction !== null
+
+    return (
+      <Button
+        type="button"
+        variant={action === "cancel" ? "outline" : "default"}
+        className={cn(
+          "h-9 w-full justify-center gap-1 rounded-xl px-1.5 text-[10px] font-semibold sm:h-10 sm:text-[11px]",
+          action === "cancel" &&
+            "border-zinc-700/80 bg-zinc-900/85 text-zinc-100 hover:bg-zinc-800",
+        )}
+        aria-busy={isActionPending}
+        aria-label={`${label} agendamento`}
+        title={label}
+        disabled={isAnyActionPending}
+        onClick={() => void handleAction(action)}
+      >
+        {isActionPending ? (
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+        ) : (
+          <Icon className="h-4 w-4 shrink-0" />
+        )}
+        <span className="min-w-0 truncate">{isActionPending ? pendingLabel : label}</span>
+      </Button>
+    )
   }
 
   return (
     <div className="grid w-full grid-cols-3 gap-1.5">
-      <Button
-        type="button"
-        variant="default"
-        className="h-9 w-full justify-center gap-1 rounded-xl px-1.5 text-[10px] font-semibold sm:h-10 sm:text-[11px]"
-        aria-label="Concluir agendamento"
-        title="Concluir"
-        disabled={isPending}
-        onClick={() => handleAction("conclude")}
+      {renderActionButton("conclude")}
+      {renderActionButton("cancel")}
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={`Entrar em contato com ${customerName} pelo WhatsApp`}
+        title="WhatsApp"
+        tabIndex={pendingAction ? -1 : undefined}
+        className={cn(
+          "inline-flex h-9 w-full items-center justify-center gap-1 rounded-xl border border-emerald-500/35 bg-emerald-500/12 px-1.5 text-[10px] font-semibold text-emerald-200 transition-colors hover:bg-emerald-500/22 sm:h-10 sm:text-[11px]",
+          pendingAction && "pointer-events-none opacity-50",
+        )}
       >
-        <CheckCircle2 className="h-4 w-4 shrink-0" />
-        <span>{pendingAction === "conclude" ? "..." : "Concluir"}</span>
-      </Button>
-
-      <Button
-        type="button"
-        variant="outline"
-        className="h-9 w-full justify-center gap-1 rounded-xl border-zinc-700/80 bg-zinc-900/85 px-1.5 text-[10px] font-semibold text-zinc-100 hover:bg-zinc-800 sm:h-10 sm:text-[11px]"
-        aria-label="Cancelar agendamento"
-        title="Cancelar"
-        disabled={isPending}
-        onClick={() => handleAction("cancel")}
-      >
-        <Ban className="h-4 w-4 shrink-0" />
-        <span>{pendingAction === "cancel" ? "..." : "Cancelar"}</span>
-      </Button>
-
-      <Button
-        type="button"
-        variant="destructive"
-        className="h-9 w-full justify-center gap-1 rounded-xl px-1.5 text-[10px] font-semibold sm:h-10 sm:text-[11px]"
-        aria-label="Excluir agendamento"
-        title="Excluir"
-        disabled={isPending}
-        onClick={() => handleAction("delete")}
-      >
-        <Trash2 className="h-4 w-4 shrink-0" />
-        <span>{pendingAction === "delete" ? "..." : "Excluir"}</span>
-      </Button>
+        <Image
+          src="/Logo%20do%20WhatsApp%20em%20estilo%20minimalista.png"
+          alt=""
+          width={16}
+          height={16}
+          className="h-4 w-4 shrink-0"
+        />
+        <span className="min-w-0 truncate">WhatsApp</span>
+      </a>
     </div>
   )
 }

@@ -42,7 +42,7 @@
   }
 
   html {
-    @apply h-full;
+    @apply min-h-full;
     scroll-behavior: smooth;
     overflow-y: scroll;
     scrollbar-gutter: stable;
@@ -51,9 +51,20 @@
   }
 
   body {
-    @apply h-full bg-background text-foreground;
+    @apply min-h-[100dvh] bg-background text-foreground;
     max-width: 100%;
     overflow-x: hidden;
+  }
+
+  #agendamento,
+  [id^="booking-"] {
+    scroll-margin-top: 6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 

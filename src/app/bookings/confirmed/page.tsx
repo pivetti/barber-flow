@@ -71,6 +71,7 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
           </p>
 
           <ConfirmedBookingActions
+            bookingId={booking.id}
             canCancel={booking.status === "SCHEDULED"}
             barberReceiptWhatsappUrl={barberReceiptWhatsappUrl}
             canSendReceipt={Boolean(barberWhatsappPhone)}

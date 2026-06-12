@@ -1,7 +1,6 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { z } from "zod"
 import { canManageServices } from "@/lib/admin-permissions"
 import { getBrasiliaTodayStart } from "@/lib/brasilia-time"
@@ -74,6 +73,20 @@ const parsePrice = (value: string) => {
   return price
 }
 
+const serializeService = (service: {
+  id: string
+  name: string
+  description: string
+  imageUrl: string
+  price: { toString(): string }
+}) => ({
+  id: service.id,
+  name: service.name,
+  description: service.description,
+  imageUrl: service.imageUrl,
+  price: service.price.toString(),
+})
+
 export const createAdminService = async (formData: FormData) => {
   const admin = await requireAdmin()
 
@@ -89,12 +102,24 @@ export const createAdminService = async (formData: FormData) => {
   })
 
   if (!parsed.success) {
-    throw new Error("Invalid service data")
+    return {
+      ok: false as const,
+      message: "Dados do servico invalidos.",
+    }
   }
 
-  const price = parsePrice(parsed.data.price)
+  let price: number
 
-  await db.service.create({
+  try {
+    price = parsePrice(parsed.data.price)
+  } catch {
+    return {
+      ok: false as const,
+      message: "Preco invalido.",
+    }
+  }
+
+  const service = await db.service.create({
     data: {
       name: parsed.data.name,
       description: parsed.data.description,
@@ -105,6 +130,11 @@ export const createAdminService = async (formData: FormData) => {
 
   revalidatePath("/admin/services")
   revalidatePath("/services")
+
+  return {
+    ok: true as const,
+    service: serializeService(service),
+  }
 }
 
 export const updateAdminService = async (formData: FormData) => {
@@ -123,12 +153,24 @@ export const updateAdminService = async (formData: FormData) => {
   })
 
   if (!parsed.success) {
-    throw new Error("Invalid service data")
+    return {
+      ok: false as const,
+      message: "Dados do servico invalidos.",
+    }
   }
 
-  const price = parsePrice(parsed.data.price)
+  let price: number
 
-  await db.service.update({
+  try {
+    price = parsePrice(parsed.data.price)
+  } catch {
+    return {
+      ok: false as const,
+      message: "Preco invalido.",
+    }
+  }
+
+  const service = await db.service.update({
     where: {
       id: parsed.data.serviceId,
     },
@@ -142,6 +184,11 @@ export const updateAdminService = async (formData: FormData) => {
 
   revalidatePath("/admin/services")
   revalidatePath("/services")
+
+  return {
+    ok: true as const,
+    service: serializeService(service),
+  }
 }
 
 export const deleteAdminService = async (formData: FormData) => {
@@ -153,7 +200,10 @@ export const deleteAdminService = async (formData: FormData) => {
 
   const parsedServiceId = idSchema.safeParse(String(formData.get("serviceId") ?? ""))
   if (!parsedServiceId.success) {
-    return
+    return {
+      ok: false as const,
+      message: "Servico invalido.",
+    }
   }
 
   const todayStart = getBrasiliaTodayStart()
@@ -178,7 +228,11 @@ export const deleteAdminService = async (formData: FormData) => {
   })
 
   if (serviceWithUpcomingScheduledBookings?.bookings.length) {
-    redirect(`/admin/services?deleteErrorServiceId=${encodeURIComponent(parsedServiceId.data)}`)
+    return {
+      ok: false as const,
+      blockedServiceId: parsedServiceId.data,
+      message: "Exclua primeiro os agendamentos futuros vinculados a este servico.",
+    }
   }
 
   await db.$transaction(async (tx) => {
@@ -195,4 +249,8 @@ export const deleteAdminService = async (formData: FormData) => {
 
   revalidatePath("/admin/services")
   revalidatePath("/services")
+
+  return {
+    ok: true as const,
+  }
 }

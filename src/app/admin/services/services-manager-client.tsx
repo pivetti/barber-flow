@@ -1,0 +1,357 @@
+"use client"
+
+import { Loader2, Plus, Save, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { createAdminService, deleteAdminService, updateAdminService } from "@/features/admin/actions/services"
+import { cn } from "@/lib/utils"
+
+export interface AdminServiceItem {
+  id: string
+  name: string
+  description: string
+  imageUrl: string
+  price: string
+}
+
+interface ServicesManagerClientProps {
+  initialServices: AdminServiceItem[]
+}
+
+interface ServiceFormState {
+  name: string
+  price: string
+  description: string
+  imageUrl: string
+}
+
+type PendingAction =
+  | { type: "create" }
+  | { type: "update"; serviceId: string }
+  | { type: "delete"; serviceId: string }
+  | null
+
+const emptyServiceForm: ServiceFormState = {
+  name: "",
+  price: "",
+  description: "",
+  imageUrl: "",
+}
+
+const sortServices = (services: AdminServiceItem[]) => {
+  return [...services].sort((left, right) => left.name.localeCompare(right.name))
+}
+
+const createServiceFormData = (service: ServiceFormState, serviceId?: string) => {
+  const formData = new FormData()
+
+  if (serviceId) {
+    formData.set("serviceId", serviceId)
+  }
+
+  formData.set("name", service.name)
+  formData.set("price", service.price)
+  formData.set("description", service.description)
+  formData.set("imageUrl", service.imageUrl)
+
+  return formData
+}
+
+const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) => {
+  const router = useRouter()
+  const [services, setServices] = useState(() => sortServices(initialServices))
+  const [newService, setNewService] = useState<ServiceFormState>(emptyServiceForm)
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null)
+
+  const pendingCreate = pendingAction?.type === "create"
+
+  const updateServiceField = (
+    serviceId: string,
+    field: keyof ServiceFormState,
+    value: string,
+  ) => {
+    setServices((currentServices) =>
+      currentServices.map((service) =>
+        service.id === serviceId ? { ...service, [field]: value } : service,
+      ),
+    )
+  }
+
+  const handleCreateService = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (pendingAction) {
+      return
+    }
+
+    setPendingAction({ type: "create" })
+
+    try {
+      const result = await createAdminService(createServiceFormData(newService))
+
+      if (!result.ok) {
+        toast.error(result.message ?? "Nao foi possivel criar o servico.")
+        return
+      }
+
+      setServices((currentServices) => sortServices([...currentServices, result.service]))
+      setNewService(emptyServiceForm)
+      toast.success("Servico criado com sucesso.")
+      router.refresh()
+    } catch {
+      toast.error("Nao foi possivel criar o servico.")
+    } finally {
+      setPendingAction(null)
+    }
+  }
+
+  const handleUpdateService = async (
+    event: React.FormEvent<HTMLFormElement>,
+    service: AdminServiceItem,
+  ) => {
+    event.preventDefault()
+
+    if (pendingAction) {
+      return
+    }
+
+    setPendingAction({ type: "update", serviceId: service.id })
+
+    try {
+      const result = await updateAdminService(createServiceFormData(service, service.id))
+
+      if (!result.ok) {
+        toast.error(result.message ?? "Nao foi possivel salvar as alteracoes.")
+        return
+      }
+
+      setServices((currentServices) =>
+        sortServices(
+          currentServices.map((currentService) =>
+            currentService.id === service.id ? result.service : currentService,
+          ),
+        ),
+      )
+      toast.success("Servico atualizado com sucesso.")
+      router.refresh()
+    } catch {
+      toast.error("Nao foi possivel salvar as alteracoes.")
+    } finally {
+      setPendingAction(null)
+    }
+  }
+
+  const handleDeleteService = async (service: AdminServiceItem) => {
+    if (pendingAction) {
+      return
+    }
+
+    const confirmed = window.confirm(`Excluir o servico "${service.name}"?`)
+
+    if (!confirmed) {
+      return
+    }
+
+    setPendingAction({ type: "delete", serviceId: service.id })
+
+    try {
+      const formData = new FormData()
+      formData.set("serviceId", service.id)
+
+      const result = await deleteAdminService(formData)
+
+      if (!result.ok) {
+        toast.error(result.message ?? "Nao foi possivel excluir o servico.")
+        return
+      }
+
+      setServices((currentServices) =>
+        currentServices.filter((currentService) => currentService.id !== service.id),
+      )
+      toast.success("Servico excluido com sucesso.")
+      router.refresh()
+    } catch {
+      toast.error("Nao foi possivel excluir o servico.")
+    } finally {
+      setPendingAction(null)
+    }
+  }
+
+  return (
+    <>
+      <section className="mt-5 rounded-3xl border border-zinc-800/65 bg-zinc-950/45 p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.24)] sm:mt-6 sm:p-5">
+        <div className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] sm:p-5">
+          <h2 className="text-lg font-semibold text-zinc-100">Novo servico</h2>
+          <form className="mt-4 grid gap-3 md:grid-cols-2" onSubmit={handleCreateService}>
+            <Input
+              name="name"
+              placeholder="Nome"
+              required
+              value={newService.name}
+              disabled={pendingCreate}
+              onChange={(event) => setNewService((service) => ({ ...service, name: event.target.value }))}
+              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
+            />
+            <Input
+              name="price"
+              placeholder="Preco (ex: 59.90)"
+              required
+              value={newService.price}
+              disabled={pendingCreate}
+              onChange={(event) => setNewService((service) => ({ ...service, price: event.target.value }))}
+              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
+            />
+            <Input
+              name="description"
+              placeholder="Descricao (opcional)"
+              value={newService.description}
+              disabled={pendingCreate}
+              onChange={(event) =>
+                setNewService((service) => ({ ...service, description: event.target.value }))
+              }
+              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
+            />
+            <Input
+              name="imageUrl"
+              placeholder="Imagem: corte.png ou /services/corte.png (opcional)"
+              value={newService.imageUrl}
+              disabled={pendingCreate}
+              onChange={(event) => setNewService((service) => ({ ...service, imageUrl: event.target.value }))}
+              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
+            />
+            <p className="text-xs text-zinc-500 md:col-span-2">
+              Dica: coloque a imagem em `public/services` e informe apenas o nome do arquivo.
+            </p>
+            <Button
+              type="submit"
+              disabled={pendingCreate}
+              className="md:col-span-2 md:w-fit rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25"
+            >
+              {pendingCreate ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Criando...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Criar servico
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-3xl border border-zinc-800/65 bg-zinc-950/45 p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.24)] sm:mt-6 sm:p-5">
+        <div className="space-y-3">
+          {services.map((service) => {
+            const cardIsPending =
+              pendingAction?.type !== "create" &&
+              pendingAction?.serviceId === service.id
+            const isUpdating =
+              pendingAction?.type === "update" && pendingAction.serviceId === service.id
+            const isDeleting =
+              pendingAction?.type === "delete" && pendingAction.serviceId === service.id
+
+            return (
+              <form
+                key={service.id}
+                onSubmit={(event) => void handleUpdateService(event, service)}
+                className={cn(
+                  "rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[0_16px_30px_rgba(0,0,0,0.28)]",
+                  cardIsPending && "opacity-80",
+                )}
+              >
+                <div className="grid gap-3 md:grid-cols-2">
+                  <Input
+                    name="name"
+                    value={service.name}
+                    required
+                    disabled={cardIsPending}
+                    onChange={(event) => updateServiceField(service.id, "name", event.target.value)}
+                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
+                  />
+                  <Input
+                    name="price"
+                    value={service.price}
+                    required
+                    disabled={cardIsPending}
+                    onChange={(event) => updateServiceField(service.id, "price", event.target.value)}
+                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
+                  />
+                  <Input
+                    name="description"
+                    value={service.description}
+                    disabled={cardIsPending}
+                    onChange={(event) =>
+                      updateServiceField(service.id, "description", event.target.value)
+                    }
+                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
+                  />
+                  <Input
+                    name="imageUrl"
+                    value={service.imageUrl}
+                    placeholder="Imagem: corte.png ou /services/corte.png"
+                    disabled={cardIsPending}
+                    onChange={(event) => updateServiceField(service.id, "imageUrl", event.target.value)}
+                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
+                  />
+                </div>
+
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    type="submit"
+                    disabled={cardIsPending}
+                    className="rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25"
+                  >
+                    {isUpdating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Salvar
+                      </>
+                    )}
+                  </Button>
+                  <button
+                    type="button"
+                    disabled={cardIsPending}
+                    onClick={() => void handleDeleteService(service)}
+                    className="inline-flex h-10 items-center justify-center rounded-xl border border-red-500/35 bg-red-500/12 px-4 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/20 disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Excluindo...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Excluir
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )
+          })}
+
+          {services.length === 0 && (
+            <p className="rounded-2xl border border-zinc-800 bg-zinc-900/55 p-4 text-sm text-zinc-400">
+              Nenhum servico cadastrado.
+            </p>
+          )}
+        </div>
+      </section>
+    </>
+  )
+}
+
+export default ServicesManagerClient

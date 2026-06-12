@@ -14,6 +14,7 @@ export interface DashboardMonthBooking {
   status: string
   cancellationRequested: boolean
   customerName: string
+  customerPhone: string
   serviceName: string
 }
 
@@ -51,6 +52,9 @@ export const getDashboardMonthBookings = async ({
   const bookings = await db.booking.findMany({
     where: {
       barberId,
+      status: {
+        not: "CANCELED",
+      },
       date: {
         gte: range.start,
         lt: range.end,
@@ -62,6 +66,7 @@ export const getDashboardMonthBookings = async ({
       status: true,
       cancellationRequested: true,
       customerName: true,
+      customerPhone: true,
       service: {
         select: {
           name: true,
@@ -83,6 +88,7 @@ export const getDashboardMonthBookings = async ({
       status: booking.status,
       cancellationRequested: booking.cancellationRequested,
       customerName: booking.customerName,
+      customerPhone: booking.customerPhone,
       serviceName: booking.service.name,
     }
   })

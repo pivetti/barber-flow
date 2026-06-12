@@ -1,14 +1,12 @@
 import Link from "next/link"
 import AdminHeader from "@/features/admin/components/admin-header"
-import { createAdminService, deleteAdminService, updateAdminService } from "@/features/admin/actions/services"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { canManageServices } from "@/lib/admin-permissions"
 import { getBrasiliaTodayStart, toBrasiliaWallClock } from "@/lib/brasilia-time"
 import { db } from "@/lib/prisma"
 import { requireAdmin } from "@/lib/require-admin"
 import { format } from "date-fns"
 import { redirect } from "next/navigation"
+import ServicesManagerClient from "./services-manager-client"
 
 interface ServicesAdminPageProps {
   searchParams?: {
@@ -28,6 +26,13 @@ const ServicesAdminPage = async ({ searchParams }: ServicesAdminPageProps) => {
       name: "asc",
     },
   })
+  const serializedServices = services.map((service) => ({
+    id: service.id,
+    name: service.name,
+    description: service.description,
+    imageUrl: service.imageUrl,
+    price: service.price.toString(),
+  }))
 
   const deleteErrorServiceId = searchParams?.deleteErrorServiceId?.trim()
   const todayStart = getBrasiliaTodayStart()
@@ -88,43 +93,9 @@ const ServicesAdminPage = async ({ searchParams }: ServicesAdminPageProps) => {
           </div>
         </section>
 
-        <section className="mt-5 rounded-3xl border border-zinc-800/65 bg-zinc-950/45 p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.24)] sm:mt-6 sm:p-5">
-          <div className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] sm:p-5">
-            <h2 className="text-lg font-semibold text-zinc-100">Novo servico</h2>
-            <form action={createAdminService} className="mt-4 grid gap-3 md:grid-cols-2">
-              <Input name="name" placeholder="Nome" required className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100" />
-              <Input
-                name="price"
-                placeholder="Preco (ex: 59.90)"
-                required
-                className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
-              />
-              <Input
-                name="description"
-                placeholder="Descricao (opcional)"
-                className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
-              />
-              <Input
-                name="imageUrl"
-                placeholder="Imagem: corte.png ou /services/corte.png (opcional)"
-                className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
-              />
-              <p className="text-xs text-zinc-500 md:col-span-2">
-                Dica: coloque a imagem em `public/services` e informe apenas o nome do arquivo.
-              </p>
-              <Button
-                type="submit"
-                className="md:col-span-2 md:w-fit rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25"
-              >
-                Criar servico
-              </Button>
-            </form>
-          </div>
-        </section>
-
-        <section className="mt-5 rounded-3xl border border-zinc-800/65 bg-zinc-950/45 p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.24)] sm:mt-6 sm:p-5">
-          {blockedService && blockedBookingCount > 0 && (
-            <div className="mb-4 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4 text-sm text-amber-100">
+        {blockedService && blockedBookingCount > 0 && (
+          <section className="mt-5 rounded-3xl border border-zinc-800/65 bg-zinc-950/45 p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.24)] sm:mt-6 sm:p-5">
+            <div className="rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4 text-sm text-amber-100">
               <p className="font-semibold">Nao foi possivel excluir o servico {blockedService.name}.</p>
               <p className="mt-1 text-amber-100/80">
                 Exclua primeiro os agendamentos agendados de hoje ou futuros vinculados a este servico e tente novamente.
@@ -149,67 +120,10 @@ const ServicesAdminPage = async ({ searchParams }: ServicesAdminPageProps) => {
                 </p>
               )}
             </div>
-          )}
+          </section>
+        )}
 
-          <div className="space-y-3">
-            {services.map((service) => (
-              <form
-                key={service.id}
-                action={updateAdminService}
-                className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[0_16px_30px_rgba(0,0,0,0.28)]"
-              >
-                <input type="hidden" name="serviceId" value={service.id} />
-                <div className="grid gap-3 md:grid-cols-2">
-                  <Input
-                    name="name"
-                    defaultValue={service.name}
-                    required
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
-                  />
-                  <Input
-                    name="price"
-                    defaultValue={String(service.price)}
-                    required
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
-                  />
-                  <Input
-                    name="description"
-                    defaultValue={service.description}
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
-                  />
-                  <Input
-                    name="imageUrl"
-                    defaultValue={service.imageUrl}
-                    placeholder="Imagem: corte.png ou /services/corte.png"
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
-                  />
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Button
-                    type="submit"
-                    className="rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25"
-                  >
-                    Salvar
-                  </Button>
-                  <button
-                    type="submit"
-                    formAction={deleteAdminService}
-                    className="inline-flex h-10 items-center justify-center rounded-xl border border-red-500/35 bg-red-500/12 px-4 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/20"
-                  >
-                    Excluir
-                  </button>
-                </div>
-              </form>
-            ))}
-
-            {services.length === 0 && (
-              <p className="rounded-2xl border border-zinc-800 bg-zinc-900/55 p-4 text-sm text-zinc-400">
-                Nenhum servico cadastrado.
-              </p>
-            )}
-          </div>
-        </section>
+        <ServicesManagerClient initialServices={serializedServices} />
       </main>
     </>
   )

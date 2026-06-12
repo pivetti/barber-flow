@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { cancelManagedBooking } from "@/features/booking/actions/manage-booking-by-token"
 import { Button } from "@/components/ui/button"
@@ -18,12 +18,14 @@ import {
 } from "@/components/ui/dialog"
 
 interface ConfirmedBookingActionsProps {
+  bookingId: string
   canCancel: boolean
   barberReceiptWhatsappUrl: string
   canSendReceipt: boolean
 }
 
 const ConfirmedBookingActions = ({
+  bookingId,
   canCancel,
   barberReceiptWhatsappUrl,
   canSendReceipt,
@@ -32,6 +34,31 @@ const ConfirmedBookingActions = ({
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [isCanceled, setIsCanceled] = useState(!canCancel)
+  const [whatsappBlocked, setWhatsappBlocked] = useState(false)
+
+  useEffect(() => {
+    if (!bookingId || !canSendReceipt || barberReceiptWhatsappUrl === "#") {
+      return
+    }
+
+    const storageKey = `whatsapp_opened_booking_${bookingId}`
+
+    try {
+      if (window.sessionStorage.getItem(storageKey)) {
+        return
+      }
+
+      window.sessionStorage.setItem(storageKey, "true")
+    } catch {
+      // If storage is unavailable, still try once for this render.
+    }
+
+    const opened = window.open(barberReceiptWhatsappUrl, "_blank", "noopener,noreferrer")
+
+    if (!opened) {
+      setWhatsappBlocked(true)
+    }
+  }, [barberReceiptWhatsappUrl, bookingId, canSendReceipt])
 
   const handleCancel = () => {
     startTransition(async () => {
@@ -70,6 +97,11 @@ const ConfirmedBookingActions = ({
         <p className="max-w-sm text-sm text-zinc-400">
           Clique para enviar o comprovante do agendamento para o WhatsApp do barbeiro.
         </p>
+        {whatsappBlocked && (
+          <p className="max-w-sm rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+            Se o WhatsApp nao abriu automaticamente, toque no botao abaixo.
+          </p>
+        )}
       </div>
 
       <Link
