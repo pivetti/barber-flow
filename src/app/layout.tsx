@@ -32,7 +32,7 @@ export default function RootLayout({
           <div className="flex-1">{children}</div>
           <Footer />
         </div>
-        <Toaster />
+        <Toaster closeButton duration={3000} visibleToasts={3} />
       </body>
     </html>
   )

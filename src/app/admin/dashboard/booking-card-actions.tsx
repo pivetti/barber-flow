@@ -10,6 +10,14 @@ import {
   concludeAdminBookingInline,
 } from "@/features/admin/actions/bookings"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
 interface BookingCardActionsProps {
@@ -75,6 +83,7 @@ const BookingCardActions = ({
 }: BookingCardActionsProps) => {
   const router = useRouter()
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const pendingActionRef = useRef<PendingAction>(null)
   const whatsappUrl = getWhatsAppUrl(customerPhone)
 
@@ -105,6 +114,10 @@ const BookingCardActions = ({
 
       onStatusChangeSuccess(bookingId)
 
+      if (action === "cancel") {
+        setCancelDialogOpen(false)
+      }
+
       toast.success(successMessage)
       router.refresh()
     } catch {
@@ -134,7 +147,14 @@ const BookingCardActions = ({
         aria-label={`${label} agendamento`}
         title={label}
         disabled={isAnyActionPending}
-        onClick={() => void handleAction(action)}
+        onClick={() => {
+          if (action === "cancel") {
+            setCancelDialogOpen(true)
+            return
+          }
+
+          void handleAction(action)
+        }}
       >
         {isActionPending ? (
           <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
@@ -150,6 +170,42 @@ const BookingCardActions = ({
     <div className="grid w-full grid-cols-3 gap-1.5">
       {renderActionButton("conclude")}
       {renderActionButton("cancel")}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent className="border-zinc-800 bg-zinc-950 text-zinc-100">
+          <DialogHeader>
+            <DialogTitle>Cancelar agendamento?</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Deseja realmente cancelar o agendamento de {customerName}?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCancelDialogOpen(false)}
+              disabled={pendingAction === "cancel"}
+              className="border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+            >
+              Voltar
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => void handleAction("cancel")}
+              disabled={pendingAction === "cancel"}
+            >
+              {pendingAction === "cancel" ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Cancelando...
+                </>
+              ) : (
+                "Sim"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <a
         href={whatsappUrl}
         target="_blank"
