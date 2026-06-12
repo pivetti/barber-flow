@@ -48,9 +48,9 @@ const EditBarberPage = async ({ params }: EditBarberPageProps) => {
       <AdminHeader adminName={admin.name} adminRole={admin.role} />
 
       <main className="mx-auto w-full max-w-3xl px-4 py-7 sm:px-6 sm:py-8">
-        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(167,139,250,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
+        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
           <div className="space-y-1.5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-300/75">Edicao</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-100/75">Edicao</p>
             <h1 className="text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">Editar barbeiro</h1>
             <p className="text-sm leading-relaxed text-zinc-400/95">Atualize dados de acesso e perfil de {barber.name}.</p>
           </div>
@@ -97,7 +97,7 @@ const EditBarberPage = async ({ params }: EditBarberPageProps) => {
             </p>
 
             <div className="mt-2 flex flex-wrap gap-2 md:col-span-2">
-              <Button type="submit" className="rounded-xl border border-violet-500/35 bg-violet-500/15 text-violet-100 hover:bg-violet-500/25">
+              <Button type="submit" className="rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25">
                 Salvar alteracoes
               </Button>
               <Link

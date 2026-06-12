@@ -74,7 +74,7 @@ const ConfirmedBookingActions = ({
 
       <Link
         href="/agendar"
-        className="inline-flex h-10 items-center justify-center rounded-xl border border-violet-500/40 bg-violet-500/10 px-4 text-sm font-semibold text-violet-100 transition-colors hover:bg-violet-500/20"
+        className="inline-flex h-10 items-center justify-center rounded-xl border border-brand/40 bg-brand/10 px-4 text-sm font-semibold text-brand-100 transition-colors hover:bg-brand/20"
       >
         Agendar mais um horário
       </Link>

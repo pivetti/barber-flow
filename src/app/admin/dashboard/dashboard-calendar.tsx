@@ -53,7 +53,7 @@ const getStatusClassName = (status: string, cancellationRequested: boolean) => {
     return "border-red-500/35 bg-red-500/14 text-red-300"
   }
 
-  return "border-violet-500/40 bg-violet-500/16 text-violet-100"
+  return "border-brand/40 bg-brand/16 text-brand-100"
 }
 
 const parseDateKey = (dateKey: string) => {
@@ -133,10 +133,10 @@ const AdminDashboardCalendar = ({
 
   return (
     <div className="mt-5 grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)] lg:items-start">
-      <aside className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(167,139,250,0.10),transparent_44%),linear-gradient(to_bottom,rgba(24,24,27,0.94),rgba(9,9,11,0.90))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.26)] sm:p-5 lg:sticky lg:top-24">
+      <aside className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.10),transparent_44%),linear-gradient(to_bottom,rgba(24,24,27,0.94),rgba(9,9,11,0.90))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.26)] sm:p-5 lg:sticky lg:top-24">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300/75">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-100/75">
               Calendario
             </p>
             <h2 className="mt-1 text-lg font-semibold text-zinc-50">Escolha o dia</h2>
@@ -145,7 +145,7 @@ const AdminDashboardCalendar = ({
           <button
             type="button"
             onClick={handleTodayClick}
-            className="inline-flex h-9 items-center justify-center rounded-xl border border-violet-500/35 bg-violet-500/15 px-3 text-xs font-semibold text-violet-100 transition-all hover:bg-violet-500/25"
+            className="inline-flex h-9 items-center justify-center rounded-xl border border-brand/35 bg-brand/15 px-3 text-xs font-semibold text-brand-100 transition-all hover:bg-brand/25"
           >
             Hoje
           </button>
@@ -168,16 +168,16 @@ const AdminDashboardCalendar = ({
           }}
           modifiersClassNames={{
             hasBookings:
-              "relative after:absolute after:bottom-1 after:left-1/2 after:h-1 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-violet-300",
+              "relative after:absolute after:bottom-1 after:left-1/2 after:h-1 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-brand-100",
           }}
           className="mx-auto mt-4 w-fit rounded-2xl border border-zinc-800/70 bg-zinc-950/45 p-3"
           classNames={{
             caption_label: "text-sm font-semibold capitalize text-zinc-100",
             head_cell: "w-9 rounded-md text-[0.75rem] font-medium text-zinc-500",
-            day: "h-9 w-9 rounded-xl p-0 text-sm font-medium text-zinc-200 hover:bg-violet-500/15 hover:text-violet-100",
+            day: "h-9 w-9 rounded-xl p-0 text-sm font-medium text-zinc-200 hover:bg-brand/15 hover:text-brand-100",
             day_selected:
-              "bg-violet-500 text-white hover:bg-violet-400 hover:text-white focus:bg-violet-500 focus:text-white",
-            day_today: "border border-violet-500/40 bg-violet-500/10 text-violet-100",
+              "bg-brand text-white hover:bg-brand-hover hover:text-white focus:bg-brand focus:text-white",
+            day_today: "border border-brand/40 bg-brand/10 text-brand-100",
             day_outside: "text-zinc-700 opacity-60",
             nav_button:
               "h-8 w-8 rounded-xl border border-zinc-800 bg-zinc-900/80 p-0 text-zinc-200 opacity-80 hover:bg-zinc-800 hover:opacity-100",
@@ -194,7 +194,7 @@ const AdminDashboardCalendar = ({
       <section className="min-w-0">
         <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-zinc-800/60 bg-zinc-950/35 px-4 py-3">
           <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300/75">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-100/75">
               Agendamentos
             </p>
             <h2 className="truncate text-base font-semibold capitalize text-zinc-50">
@@ -202,7 +202,7 @@ const AdminDashboardCalendar = ({
             </h2>
           </div>
           <span className="inline-flex h-9 shrink-0 items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 text-xs font-semibold text-zinc-300">
-            <CalendarDays className="h-4 w-4 text-violet-200" />
+            <CalendarDays className="h-4 w-4 text-brand-100" />
             {selectedBookings.length}
           </span>
         </div>
@@ -217,11 +217,11 @@ const AdminDashboardCalendar = ({
             {selectedBookings.map((booking) => (
               <article
                 key={booking.id}
-                className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-3.5 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-500/30 hover:shadow-[0_16px_30px_rgba(0,0,0,0.28)] sm:p-4"
+                className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-3.5 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[0_16px_30px_rgba(0,0,0,0.28)] sm:p-4"
               >
                 <div className="flex h-full flex-col gap-3">
                   <div className="flex items-start justify-between gap-2.5">
-                    <p className="inline-flex h-9 min-w-[72px] shrink-0 items-center justify-center rounded-xl border border-violet-500/30 bg-violet-500/10 px-2 text-[17px] font-semibold leading-none text-violet-100">
+                    <p className="inline-flex h-9 min-w-[72px] shrink-0 items-center justify-center rounded-xl border border-brand/30 bg-brand/10 px-2 text-[17px] font-semibold leading-none text-brand-100">
                       {booking.time}
                     </p>
 
@@ -255,7 +255,7 @@ const AdminDashboardCalendar = ({
 
                     <Link
                       href={`/admin/bookings/${booking.id}`}
-                      className="inline-flex h-8 shrink-0 items-center justify-center gap-1 rounded-xl border border-violet-500/35 bg-violet-500/12 px-2.5 text-[11px] font-semibold text-violet-100 transition-colors hover:bg-violet-500/25"
+                      className="inline-flex h-8 shrink-0 items-center justify-center gap-1 rounded-xl border border-brand/35 bg-brand/12 px-2.5 text-[11px] font-semibold text-brand-100 transition-colors hover:bg-brand/25"
                     >
                       <Pencil className="h-3 w-3 shrink-0" />
                       Editar

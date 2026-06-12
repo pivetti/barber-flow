@@ -28,7 +28,7 @@ const Header = () => {
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-10 w-10 rounded-xl border border-zinc-800 bg-zinc-900/80 text-zinc-100 transition-all hover:border-violet-500/40 hover:bg-zinc-800/90 hover:text-violet-100 focus-visible:ring-violet-500"
+                className="h-10 w-10 rounded-xl border border-zinc-800 bg-zinc-900/80 text-zinc-100 transition-all hover:border-brand/40 hover:bg-zinc-800/90 hover:text-brand-100 focus-visible:ring-brand"
                 aria-label="Abrir menu"
               >
                 <MenuIcon className="h-5 w-5" />

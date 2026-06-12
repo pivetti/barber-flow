@@ -91,7 +91,7 @@ const AdminMobileMenu = ({ adminName, links }: AdminMobileMenuProps) => {
                   className={cn(
                     "group flex h-11 items-center gap-3 rounded-2xl border px-4 text-sm font-medium transition-colors",
                     isActiveLink(link.href)
-                      ? "border-violet-500/40 bg-violet-500/20 text-violet-100"
+                      ? "border-brand/40 bg-brand/20 text-brand-100"
                       : "border-zinc-800 bg-zinc-900/70 text-zinc-200 hover:border-zinc-700 hover:bg-zinc-900",
                   )}
                 >

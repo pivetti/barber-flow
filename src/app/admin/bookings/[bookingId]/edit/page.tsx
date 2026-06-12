@@ -91,17 +91,17 @@ const BookingEditPage = async ({ params, searchParams }: BookingEditPageProps) =
       <AdminHeader adminName={admin.name} adminRole={admin.role} />
 
       <main className="mx-auto w-full max-w-5xl px-4 py-7 sm:px-6 sm:py-8">
-        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(167,139,250,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
+        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0 space-y-1.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-300/75">Edicao</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-100/75">Edicao</p>
               <h1 className="text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">{getFieldTitle(fieldParam)}</h1>
               <p className="max-w-2xl text-sm leading-relaxed text-zinc-400/95">{getFieldDescription(fieldParam)}</p>
             </div>
 
             <Link
               href={`/admin/bookings/${booking.id}`}
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-zinc-700/80 bg-zinc-900/85 px-4 text-sm font-semibold text-zinc-100 transition-colors hover:border-violet-500/40 hover:bg-zinc-800 sm:w-auto"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-zinc-700/80 bg-zinc-900/85 px-4 text-sm font-semibold text-zinc-100 transition-colors hover:border-brand/40 hover:bg-zinc-800 sm:w-auto"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar para agendamento
@@ -161,7 +161,7 @@ const BookingEditPage = async ({ params, searchParams }: BookingEditPageProps) =
                     name="serviceId"
                     defaultValue={booking.serviceId}
                     required
-                    className="h-11 w-full rounded-xl border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-violet-500/50"
+                    className="h-11 w-full rounded-xl border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
                   >
                     {services.map((service) => (
                       <option key={service.id} value={service.id}>
@@ -211,7 +211,7 @@ const BookingEditPage = async ({ params, searchParams }: BookingEditPageProps) =
                 >
                   Cancelar
                 </Link>
-                <Button type="submit" className="h-11 rounded-xl border border-violet-500/35 bg-violet-500/15 px-5 text-sm font-semibold text-violet-100 hover:bg-violet-500/25">
+                <Button type="submit" className="h-11 rounded-xl border border-brand/35 bg-brand/15 px-5 text-sm font-semibold text-brand-100 hover:bg-brand/25">
                   <Save className="mr-1.5 h-4 w-4" />
                   Salvar alteracoes
                 </Button>

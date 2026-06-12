@@ -42,10 +42,10 @@ const BarbersAdminPage = async () => {
       <AdminHeader adminName={admin.name} adminRole={admin.role} />
 
       <main className="mx-auto w-full max-w-6xl px-4 py-7 sm:px-6 sm:py-8">
-        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(167,139,250,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
+        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-300/75">Gestao</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-100/75">Gestao</p>
               <h1 className="text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">Barbeiros</h1>
               <p className="max-w-2xl text-sm leading-relaxed text-zinc-400/95">
                 Gerencie usuarios barbeiros, permissoes e status de acesso ao painel.
@@ -54,7 +54,7 @@ const BarbersAdminPage = async () => {
 
             <Link
               href="/admin/barbers/new"
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-violet-500/35 bg-violet-500/15 px-4 text-sm font-semibold text-violet-100 transition-colors hover:bg-violet-500/25"
+              className="inline-flex h-11 items-center justify-center rounded-xl border border-brand/35 bg-brand/15 px-4 text-sm font-semibold text-brand-100 transition-colors hover:bg-brand/25"
             >
               Novo barbeiro
             </Link>
@@ -72,7 +72,7 @@ const BarbersAdminPage = async () => {
               return (
                 <article
                   key={barber.id}
-                  className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-500/30 hover:shadow-[0_16px_30px_rgba(0,0,0,0.28)]"
+                  className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[0_16px_30px_rgba(0,0,0,0.28)]"
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="space-y-1">

@@ -79,7 +79,7 @@ const BarbersFlow = ({ barbers }: BarbersFlowProps) => {
                   {barber.name}
                 </h2>
                 <Button
-                  className="h-7.5 w-full rounded-xl bg-violet-500 px-3 text-xs font-semibold text-white hover:bg-violet-400 sm:h-9 sm:text-sm"
+                  className="h-7.5 w-full rounded-xl bg-brand px-3 text-xs font-semibold text-white hover:bg-brand-hover sm:h-9 sm:text-sm"
                   onClick={() => handleSelectBarber(barber.id)}
                 >
                   Selecionar

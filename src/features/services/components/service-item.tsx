@@ -323,7 +323,7 @@ const ServiceItem = ({ service, barber }: ServiceItemProps) => {
 
   return (
     <>
-      <Card className="group h-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70 transition-all duration-200 hover:border-violet-500/40">
+      <Card className="group h-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70 transition-all duration-200 hover:border-brand/40">
         <CardContent className="flex h-full flex-col p-0">
           <div className="grid grid-cols-[44px_1fr] items-center gap-2 p-2.5 sm:grid-cols-[110px_1fr] sm:gap-4 sm:p-5">
             <div className="relative h-11 w-11 shrink-0 sm:h-[110px] sm:w-[110px]">
@@ -348,11 +348,11 @@ const ServiceItem = ({ service, barber }: ServiceItemProps) => {
 
           <div className="mt-auto border-t border-zinc-800 bg-zinc-950/40 p-3 sm:p-5">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-              <div className="rounded-xl border border-violet-500/30 bg-violet-500/10 px-3 py-2 sm:px-4 sm:py-3">
+              <div className="rounded-xl border border-brand/30 bg-brand/10 px-3 py-2 sm:px-4 sm:py-3">
                 <p className="text-[9px] uppercase tracking-[0.14em] text-zinc-400 sm:text-[10px]">
                   Valor
                 </p>
-                <p className="text-sm font-bold text-violet-300 sm:text-base">
+                <p className="text-sm font-bold text-brand-100 sm:text-base">
                   {Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
@@ -364,7 +364,7 @@ const ServiceItem = ({ service, barber }: ServiceItemProps) => {
                 variant="default"
                 size="default"
                 onClick={handleBookingClick}
-                className="h-10 w-full rounded-xl bg-violet-500 text-sm font-semibold text-white hover:bg-violet-400 sm:h-10 sm:w-auto sm:min-w-[132px]"
+                className="h-10 w-full rounded-xl bg-brand text-sm font-semibold text-white hover:bg-brand-hover sm:h-10 sm:w-auto sm:min-w-[132px]"
               >
                 Reservar
               </Button>

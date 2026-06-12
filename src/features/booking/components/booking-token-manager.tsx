@@ -145,7 +145,7 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
                 href="https://wa.me/5500000000000"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-700 px-4 text-sm font-medium text-zinc-100 transition-colors hover:border-violet-500/40 hover:bg-violet-500/10"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-zinc-700 px-4 text-sm font-medium text-zinc-100 transition-colors hover:border-brand/40 hover:bg-brand/10"
               >
                 Falar com o barbeiro
               </Link>

@@ -45,7 +45,7 @@ const getStatusClassName = (status: string, cancellationRequested: boolean) => {
     return "border-red-500/35 bg-red-500/14 text-red-300"
   }
 
-  return "border-violet-500/40 bg-violet-500/16 text-violet-100"
+  return "border-brand/40 bg-brand/16 text-brand-100"
 }
 
 const formatPhone = (value: string) => {
@@ -64,7 +64,7 @@ const formatPhone = (value: string) => {
 }
 
 const editButtonClassName =
-  "inline-flex items-center gap-1 rounded-lg border border-zinc-700/80 bg-zinc-900/85 px-2.5 py-1 text-xs font-semibold text-zinc-200 transition-colors hover:border-violet-500/35 hover:bg-zinc-800 hover:text-zinc-100"
+  "inline-flex items-center gap-1 rounded-lg border border-zinc-700/80 bg-zinc-900/85 px-2.5 py-1 text-xs font-semibold text-zinc-200 transition-colors hover:border-brand/35 hover:bg-zinc-800 hover:text-zinc-100"
 
 const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
   const admin = await requireAdmin()
@@ -92,10 +92,10 @@ const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
       <AdminHeader adminName={admin.name} adminRole={admin.role} />
 
       <main className="mx-auto w-full max-w-5xl px-4 py-7 sm:px-6 sm:py-8">
-        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(167,139,250,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
+        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0 space-y-1.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-violet-300/75">Agendamento</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-100/75">Agendamento</p>
               <h1 className="text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">Gerenciar registro</h1>
               <p className="max-w-2xl text-sm leading-relaxed text-zinc-400/95">
                 Visualize os detalhes do agendamento e atualize o status de forma rapida.
@@ -104,7 +104,7 @@ const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
 
             <Link
               href="/admin/dashboard"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-zinc-700/80 bg-zinc-900/85 px-4 text-sm font-semibold text-zinc-100 transition-colors hover:border-violet-500/40 hover:bg-zinc-800 sm:w-auto"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-zinc-700/80 bg-zinc-900/85 px-4 text-sm font-semibold text-zinc-100 transition-colors hover:border-brand/40 hover:bg-zinc-800 sm:w-auto"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar para dashboard
@@ -163,7 +163,7 @@ const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
                   </Link>
                 </div>
 
-                <p className="mt-3 inline-flex h-11 min-w-[94px] items-center justify-center rounded-xl border border-violet-500/30 bg-violet-500/10 px-3 text-2xl font-semibold leading-none text-violet-100 sm:text-3xl">
+                <p className="mt-3 inline-flex h-11 min-w-[94px] items-center justify-center rounded-xl border border-brand/30 bg-brand/10 px-3 text-2xl font-semibold leading-none text-brand-100 sm:text-3xl">
                   {format(toBrasiliaWallClock(booking.date), "HH:mm", { locale: ptBR })}
                 </p>
               </div>

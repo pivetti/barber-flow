@@ -26,7 +26,7 @@ const ServicesPage = async ({ searchParams }: ServicesPageProps) => {
           <p className="mt-3 text-sm text-zinc-400">Selecione um barbeiro antes de escolher o servico.</p>
           <Link
             href="/barbers"
-            className="mt-6 inline-flex h-10 items-center justify-center rounded-xl bg-violet-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-violet-400"
+            className="mt-6 inline-flex h-10 items-center justify-center rounded-xl bg-brand px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
           >
             Escolher barbeiro
           </Link>
@@ -84,7 +84,7 @@ const ServicesPage = async ({ searchParams }: ServicesPageProps) => {
           <h1 className="text-xl font-bold md:text-2xl">Barbeiro nao encontrado</h1>
           <Link
             href="/barbers"
-            className="mt-6 inline-flex h-10 items-center justify-center rounded-xl bg-violet-500 px-4 text-sm font-semibold text-white transition-colors hover:bg-violet-400"
+            className="mt-6 inline-flex h-10 items-center justify-center rounded-xl bg-brand px-4 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
           >
             Voltar para barbeiros
           </Link>
@@ -116,7 +116,7 @@ const ServicesPage = async ({ searchParams }: ServicesPageProps) => {
 
             <Link
               href="/barbers"
-              className="inline-flex h-9 items-center justify-center rounded-lg border border-violet-500/35 bg-violet-500/10 px-3 text-sm font-medium text-violet-100 transition-colors hover:bg-violet-500/20"
+              className="inline-flex h-9 items-center justify-center rounded-lg border border-brand/35 bg-brand/10 px-3 text-sm font-medium text-brand-100 transition-colors hover:bg-brand/20"
             >
               Trocar barbeiro
             </Link>

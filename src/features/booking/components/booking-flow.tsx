@@ -215,7 +215,7 @@ const SectionStatus = ({
       className={cn(
         "inline-flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold",
         isActive
-          ? "border-violet-400 bg-violet-500/15 text-violet-100"
+          ? "border-brand-hover bg-brand/15 text-brand-100"
           : "border-zinc-700 bg-zinc-900 text-zinc-500",
       )}
     >
@@ -247,13 +247,13 @@ const StepShell = ({
     id={`booking-${id}`}
     className={cn(
       "scroll-mt-24 rounded-lg border bg-zinc-900/55 p-4 shadow-sm transition-colors sm:p-5",
-      isActive ? "border-violet-400/55" : "border-zinc-800",
+      isActive ? "border-brand-hover/55" : "border-zinc-800",
       isDisabled && "opacity-70",
     )}
   >
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200/85">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-100/85">
           {eyebrow}
         </p>
         <h2 className="mt-1 text-lg font-bold leading-tight text-zinc-50 sm:text-xl">
@@ -287,7 +287,7 @@ const CheckoutProgress = ({
               step.isComplete
                 ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-200"
                 : step.isActive
-                  ? "border-violet-400 bg-violet-500 text-white"
+                  ? "border-brand-hover bg-brand text-white"
                   : "border-zinc-700 bg-zinc-900 text-zinc-500",
             )}
           >
@@ -340,7 +340,7 @@ const CollapsedStepCard = ({
     className={cn(
       "flex w-full scroll-mt-24 items-center gap-3 rounded-lg border bg-zinc-900/35 p-3 text-left transition-colors",
       isEnabled
-        ? "border-zinc-800 hover:border-violet-400/45 hover:bg-zinc-900/65"
+        ? "border-zinc-800 hover:border-brand-hover/45 hover:bg-zinc-900/65"
         : "cursor-not-allowed border-zinc-900 bg-zinc-950/30 opacity-65",
       isComplete && "border-emerald-500/25 bg-emerald-500/5",
     )}
@@ -362,7 +362,7 @@ const CollapsedStepCard = ({
     <span
       className={cn(
         "hidden shrink-0 items-center gap-1 text-xs font-semibold sm:inline-flex",
-        isEnabled ? "text-violet-200" : "text-zinc-600",
+        isEnabled ? "text-brand-100" : "text-zinc-600",
       )}
     >
       {isComplete ? "Editar" : "Abrir"}
@@ -397,7 +397,7 @@ const CustomerStep = ({
     <form className="grid gap-3 sm:grid-cols-[1fr_220px_auto]" onSubmit={onSubmit}>
       <label className="space-y-2">
         <span className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-          <UserRound className="h-4 w-4 text-violet-200" />
+          <UserRound className="h-4 w-4 text-brand-100" />
           Nome
         </span>
         <Input
@@ -409,14 +409,14 @@ const CustomerStep = ({
             })
           }
           placeholder="Seu nome"
-          className="h-12 rounded-lg border-zinc-700 bg-zinc-950/60 text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-violet-400"
+          className="h-12 rounded-lg border-zinc-700 bg-zinc-950/60 text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-brand-hover"
           required
         />
       </label>
 
       <label className="space-y-2">
         <span className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-          <Phone className="h-4 w-4 text-violet-200" />
+          <Phone className="h-4 w-4 text-brand-100" />
           Telefone
         </span>
         <Input
@@ -430,7 +430,7 @@ const CustomerStep = ({
             })
           }
           placeholder="(00) 00000-0000"
-          className="h-12 rounded-lg border-zinc-700 bg-zinc-950/60 text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-violet-400"
+          className="h-12 rounded-lg border-zinc-700 bg-zinc-950/60 text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-brand-hover"
           required
         />
       </label>
@@ -438,7 +438,7 @@ const CustomerStep = ({
       <div className="flex items-end">
         <Button
           type="submit"
-          className="h-12 w-full gap-2 rounded-lg bg-violet-500 px-5 font-semibold text-white hover:bg-violet-400 sm:w-auto"
+          className="h-12 w-full gap-2 rounded-lg bg-brand px-5 font-semibold text-white hover:bg-brand-hover sm:w-auto"
         >
           <Check className="h-4 w-4" />
           Continuar
@@ -494,9 +494,9 @@ const BarberStep = ({
               onClick={() => onSelectBarber(barber.id)}
               aria-pressed={isSelected}
               className={cn(
-                "group overflow-hidden rounded-lg border bg-zinc-950/45 text-left transition-all hover:border-violet-400/50 hover:bg-zinc-900",
+                "group overflow-hidden rounded-lg border bg-zinc-950/45 text-left transition-all hover:border-brand-hover/50 hover:bg-zinc-900",
                 isSelected
-                  ? "border-violet-400 bg-violet-500/10 shadow-sm shadow-violet-950/30"
+                  ? "border-brand-hover bg-brand/10 shadow-sm shadow-brand-950/30"
                   : "border-zinc-800",
               )}
             >
@@ -509,7 +509,7 @@ const BarberStep = ({
                   className="object-contain p-2.5 transition-transform duration-200 group-hover:scale-[1.02]"
                 />
                 {isSelected && (
-                  <span className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white">
+                  <span className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white">
                     <Check className="h-4 w-4" />
                   </span>
                 )}
@@ -522,7 +522,7 @@ const BarberStep = ({
                   className={cn(
                     "shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold",
                     isSelected
-                      ? "border-violet-400/45 bg-violet-500/20 text-violet-100"
+                      ? "border-brand-hover/45 bg-brand/20 text-brand-100"
                       : "border-zinc-700 text-zinc-400",
                   )}
                 >
@@ -582,8 +582,8 @@ const ServiceStep = ({
               onClick={() => onSelectService(service.id)}
               aria-pressed={isSelected}
               className={cn(
-                "grid grid-cols-[56px_1fr] gap-3 rounded-lg border bg-zinc-950/45 p-3 text-left transition-colors hover:border-violet-400/50 hover:bg-zinc-900 sm:grid-cols-[64px_1fr]",
-                isSelected ? "border-violet-400 bg-violet-500/10" : "border-zinc-800",
+                "grid grid-cols-[56px_1fr] gap-3 rounded-lg border bg-zinc-950/45 p-3 text-left transition-colors hover:border-brand-hover/50 hover:bg-zinc-900 sm:grid-cols-[64px_1fr]",
+                isSelected ? "border-brand-hover bg-brand/10" : "border-zinc-800",
               )}
             >
               <span className="relative h-14 w-14 overflow-hidden rounded-lg bg-zinc-900 sm:h-16 sm:w-16">
@@ -601,12 +601,12 @@ const ServiceStep = ({
                   <span className="min-w-0 text-sm font-semibold leading-tight text-zinc-100 sm:text-base">
                     {service.name}
                   </span>
-                  {isSelected && <CheckCircle2 className="h-5 w-5 shrink-0 text-violet-200" />}
+                  {isSelected && <CheckCircle2 className="h-5 w-5 shrink-0 text-brand-100" />}
                 </span>
                 <span className="mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-400 sm:text-sm">
                   {service.description}
                 </span>
-                <span className="mt-2 inline-flex rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs font-bold text-violet-100">
+                <span className="mt-2 inline-flex rounded-full border border-brand-hover/30 bg-brand/10 px-3 py-1 text-xs font-bold text-brand-100">
                   {currencyFormatter.format(Number(service.price))}
                 </span>
               </span>
@@ -664,7 +664,7 @@ const DateTimeStep = ({
       <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
         <div className="rounded-lg border border-zinc-800 bg-zinc-950/35 p-3">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-100">
-            <CalendarDays className="h-4 w-4 text-violet-200" />
+            <CalendarDays className="h-4 w-4 text-brand-100" />
             Escolha a data
           </div>
           <Calendar
@@ -687,7 +687,7 @@ const DateTimeStep = ({
         <div className="rounded-lg border border-zinc-800 bg-zinc-950/35 p-3">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-zinc-100">
-              <Clock3 className="h-4 w-4 text-violet-200" />
+              <Clock3 className="h-4 w-4 text-brand-100" />
               Escolha o horario
             </div>
             {selectedBarber && (
@@ -703,7 +703,7 @@ const DateTimeStep = ({
             </div>
           ) : dayContextStatus === "loading" ? (
             <div className="flex min-h-[136px] flex-col items-center justify-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/45 px-4 text-center text-sm text-zinc-400">
-              <Loader2 className="h-5 w-5 animate-spin text-violet-200" />
+              <Loader2 className="h-5 w-5 animate-spin text-brand-100" />
               Buscando horarios livres...
             </div>
           ) : dayContextStatus === "error" ? (
@@ -726,9 +726,9 @@ const DateTimeStep = ({
                     onSelectTime(slot.time)
                   }}
                   className={cn(
-                    "h-11 rounded-lg border-zinc-700 bg-zinc-900 text-sm font-semibold text-zinc-100 hover:border-violet-400/50 hover:bg-violet-500/10",
+                    "h-11 rounded-lg border-zinc-700 bg-zinc-900 text-sm font-semibold text-zinc-100 hover:border-brand-hover/50 hover:bg-brand/10",
                     selectedTime === slot.time &&
-                      "border-violet-400 bg-violet-500 text-white hover:bg-violet-400",
+                      "border-brand-hover bg-brand text-white hover:bg-brand-hover",
                     !slot.available &&
                       "border-zinc-800 bg-zinc-950 text-zinc-600 hover:border-zinc-800 hover:bg-zinc-950 hover:text-zinc-600",
                   )}
@@ -813,7 +813,7 @@ const BookingResumeCard = ({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200/85">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand-100/85">
             Etapa 05
           </p>
           <h2 className={cn("mt-1 font-bold text-zinc-50", compact ? "text-base" : "text-lg")}>
@@ -897,7 +897,7 @@ const BookingResumeCard = ({
         onClick={onConfirm}
         disabled={!bookingIsReady || isCreatingBooking}
         className={cn(
-          "w-full gap-2 rounded-lg bg-violet-500 text-sm font-bold text-white hover:bg-violet-400",
+          "w-full gap-2 rounded-lg bg-brand text-sm font-bold text-white hover:bg-brand-hover",
           compact ? "mt-3 h-11" : "mt-5 h-12",
         )}
       >
@@ -1407,7 +1407,7 @@ const BookingFlow = ({
     >
       <div className="mb-4 flex flex-col gap-2">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-200/85">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-100/85">
             Agendamento
           </p>
           <h1 className="mt-1 text-xl font-bold leading-tight text-zinc-50 sm:text-2xl">
