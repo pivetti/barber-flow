@@ -66,7 +66,7 @@ const Home = async () => {
     <div>
       <Header />
 
-      <main className="w-full px-4 py-8 sm:px-6">
+      <main className="w-full scroll-smooth px-4 py-8 sm:px-6">
         <section className="mx-auto w-full max-w-6xl space-y-1 xl:max-w-7xl">
           <h2 className="text-xl font-bold md:text-2xl">Ola, seja bem-vindo!</h2>
 
@@ -105,6 +105,15 @@ const Home = async () => {
             </div>
           </div>
         </section>
+
+        <div className="mx-auto mt-4 flex w-full max-w-6xl justify-center px-2 md:hidden xl:max-w-7xl">
+          <a
+            href="#agendamento"
+            className="inline-flex h-12 w-full max-w-sm items-center justify-center rounded-xl bg-brand px-6 text-sm font-semibold text-white shadow-md shadow-brand-950/30 transition-colors hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-100 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+          >
+            Agendar
+          </a>
+        </div>
 
         <BookingFlow
           id="agendamento"
