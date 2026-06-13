@@ -30,7 +30,10 @@ import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
-type ServiceItemModel = Pick<Service, "id" | "name" | "description" | "imageUrl"> & {
+type ServiceItemModel = Pick<
+  Service,
+  "id" | "name" | "description" | "imageUrl" | "durationMinutes"
+> & {
   price: Service["price"] | number | string
 }
 
@@ -172,7 +175,7 @@ const ServiceItem = ({ service, barber }: ServiceItemProps) => {
         return
       }
 
-      const cacheKey = `${barber.id}:${selectedDay.toISOString().slice(0, 10)}`
+      const cacheKey = `${barber.id}:${service.id}:${selectedDay.toISOString().slice(0, 10)}`
       const cachedAvailableTimes = dayContextCacheRef.current[cacheKey]
 
       if (cachedAvailableTimes) {
@@ -188,6 +191,7 @@ const ServiceItem = ({ service, barber }: ServiceItemProps) => {
         const context = await getBookingDayContext({
           date: selectedDay,
           barberId: barber.id,
+          serviceId: service.id,
         })
 
         if (!isMounted || requestId !== fetchRequestIdRef.current) {
@@ -357,6 +361,14 @@ const ServiceItem = ({ service, barber }: ServiceItemProps) => {
                     style: "currency",
                     currency: "BRL",
                   }).format(Number(service.price))}
+                </p>
+              </div>
+              <div className="rounded-xl border border-zinc-700 bg-zinc-900/70 px-3 py-2 sm:px-4 sm:py-3">
+                <p className="text-[9px] uppercase tracking-[0.14em] text-zinc-400 sm:text-[10px]">
+                  Duracao
+                </p>
+                <p className="text-sm font-bold text-zinc-100 sm:text-base">
+                  {service.durationMinutes} min
                 </p>
               </div>
 

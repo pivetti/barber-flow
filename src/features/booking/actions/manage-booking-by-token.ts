@@ -39,9 +39,9 @@ const mapPublicBooking = (booking: NonNullable<Awaited<ReturnType<typeof getPubl
   status: booking.status,
   customerName: booking.customerName,
   customerPhone: booking.customerPhone,
-  date: booking.date,
+  startsAt: booking.startsAt,
   cancellationRequested: booking.cancellationRequested,
-  serviceName: booking.service.name,
+  serviceName: booking.serviceName,
   barberName: booking.barber?.name ?? null,
 })
 
@@ -124,7 +124,7 @@ export const cancelManagedBooking = async () => {
     return { ok: false, message: "Este agendamento ja foi cancelado" }
   }
 
-  if (booking.status === "DONE" || booking.date < new Date()) {
+  if (booking.status === "DONE" || booking.startsAt < new Date()) {
     return { ok: false, message: "Nao e possivel cancelar um agendamento encerrado" }
   }
 
@@ -161,7 +161,7 @@ export const requestManagedCancellation = async () => {
     return { ok: false, message: "Este agendamento ja foi cancelado" }
   }
 
-  if (booking.status === "DONE" || booking.date < new Date()) {
+  if (booking.status === "DONE" || booking.startsAt < new Date()) {
     return { ok: false, message: "Este agendamento ja foi encerrado" }
   }
 

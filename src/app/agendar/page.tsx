@@ -13,6 +13,9 @@ const AgendarPage = async () => {
     description: string
     imageUrl: string
     price: string
+    durationMinutes: number
+    bufferBeforeMinutes: number
+    bufferAfterMinutes: number
   }> = []
 
   try {
@@ -31,6 +34,9 @@ const AgendarPage = async () => {
         },
       }),
       db.service.findMany({
+        where: {
+          isActive: true,
+        },
         orderBy: {
           name: "asc",
         },
@@ -40,6 +46,9 @@ const AgendarPage = async () => {
           description: true,
           imageUrl: true,
           price: true,
+          durationMinutes: true,
+          bufferBeforeMinutes: true,
+          bufferAfterMinutes: true,
         },
       }),
     ])
@@ -56,6 +65,9 @@ const AgendarPage = async () => {
       description: service.description,
       imageUrl: getSafePublicImagePath(service.imageUrl, "/logo-jesi.png"),
       price: service.price.toString(),
+      durationMinutes: service.durationMinutes,
+      bufferBeforeMinutes: service.bufferBeforeMinutes,
+      bufferAfterMinutes: service.bufferAfterMinutes,
     }))
   } catch (error) {
     console.error("[agendar-page] failed to load booking flow data", error)

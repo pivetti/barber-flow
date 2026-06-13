@@ -42,6 +42,7 @@ const ServicesPage = async ({ searchParams }: ServicesPageProps) => {
     description: string
     imageUrl: string
     price: { toString: () => string }
+    durationMinutes: number
   }> = []
 
   try {
@@ -57,6 +58,9 @@ const ServicesPage = async ({ searchParams }: ServicesPageProps) => {
         },
       }),
       db.service.findMany({
+        where: {
+          isActive: true,
+        },
         orderBy: {
           name: "asc",
         },
@@ -66,6 +70,7 @@ const ServicesPage = async ({ searchParams }: ServicesPageProps) => {
           description: true,
           imageUrl: true,
           price: true,
+          durationMinutes: true,
         },
       }),
     ])
@@ -97,6 +102,7 @@ const ServicesPage = async ({ searchParams }: ServicesPageProps) => {
     ...service,
     imageUrl: getSafePublicImagePath(service.imageUrl, "/logo-jesi.png"),
     price: service.price.toString(),
+    durationMinutes: service.durationMinutes,
   }))
 
   return (

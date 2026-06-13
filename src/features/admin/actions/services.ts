@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { canManageServices } from "@/lib/admin-permissions"
-import { getBrasiliaTodayStart } from "@/lib/brasilia-time"
 import {
   idSchema,
   sanitizeText,
@@ -30,12 +29,35 @@ const priceInputSchema = z
   .string()
   .transform((value) => value.replace(",", ".").trim())
   .pipe(z.string().regex(/^\d+(\.\d{1,2})?$/).max(16))
+const allowedServiceDurationMinutes = [10, 15, 20, 30, 45, 60, 75, 90, 120] as const
+const allowedServiceBufferMinutes = [0, 5, 10, 15, 20, 30] as const
+const serviceDurationInputSchema = z
+  .string()
+  .transform((value) => value.trim())
+  .transform((value) => (value.length === 0 ? 30 : Number(value)))
+  .refine((value) => Number.isInteger(value), "Invalid duration")
+  .refine(
+    (value) => allowedServiceDurationMinutes.includes(value as (typeof allowedServiceDurationMinutes)[number]),
+    "Invalid duration",
+  )
+const serviceBufferInputSchema = z
+  .string()
+  .transform((value) => value.trim())
+  .transform((value) => (value.length === 0 ? 0 : Number(value)))
+  .refine((value) => Number.isInteger(value), "Invalid buffer")
+  .refine(
+    (value) => allowedServiceBufferMinutes.includes(value as (typeof allowedServiceBufferMinutes)[number]),
+    "Invalid buffer",
+  )
 
 const createServiceSchema = z.object({
   name: serviceNameSchema,
   description: serviceDescriptionSchema,
   imageUrl: serviceImageInputSchema,
   price: priceInputSchema,
+  durationMinutes: serviceDurationInputSchema,
+  bufferBeforeMinutes: serviceBufferInputSchema,
+  bufferAfterMinutes: serviceBufferInputSchema,
 })
 
 const updateServiceSchema = createServiceSchema.extend({
@@ -73,18 +95,33 @@ const parsePrice = (value: string) => {
   return price
 }
 
+const revalidateServicePages = () => {
+  revalidatePath("/")
+  revalidatePath("/agendar")
+  revalidatePath("/admin/services")
+  revalidatePath("/services")
+}
+
 const serializeService = (service: {
   id: string
   name: string
   description: string
   imageUrl: string
   price: { toString(): string }
+  durationMinutes: number
+  bufferBeforeMinutes: number
+  bufferAfterMinutes: number
+  isActive: boolean
 }) => ({
   id: service.id,
   name: service.name,
   description: service.description,
   imageUrl: service.imageUrl,
   price: service.price.toString(),
+  durationMinutes: String(service.durationMinutes),
+  bufferBeforeMinutes: String(service.bufferBeforeMinutes),
+  bufferAfterMinutes: String(service.bufferAfterMinutes),
+  isActive: service.isActive,
 })
 
 export const createAdminService = async (formData: FormData) => {
@@ -99,6 +136,9 @@ export const createAdminService = async (formData: FormData) => {
     description: String(formData.get("description") ?? ""),
     imageUrl: String(formData.get("imageUrl") ?? ""),
     price: String(formData.get("price") ?? ""),
+    durationMinutes: String(formData.get("durationMinutes") ?? ""),
+    bufferBeforeMinutes: String(formData.get("bufferBeforeMinutes") ?? ""),
+    bufferAfterMinutes: String(formData.get("bufferAfterMinutes") ?? ""),
   })
 
   if (!parsed.success) {
@@ -125,11 +165,13 @@ export const createAdminService = async (formData: FormData) => {
       description: parsed.data.description,
       imageUrl: resolveServiceImageUrl(parsed.data.imageUrl) ?? DEFAULT_SERVICE_IMAGE_URL,
       price,
+      durationMinutes: parsed.data.durationMinutes,
+      bufferBeforeMinutes: parsed.data.bufferBeforeMinutes,
+      bufferAfterMinutes: parsed.data.bufferAfterMinutes,
     },
   })
 
-  revalidatePath("/admin/services")
-  revalidatePath("/services")
+  revalidateServicePages()
 
   return {
     ok: true as const,
@@ -150,6 +192,9 @@ export const updateAdminService = async (formData: FormData) => {
     description: String(formData.get("description") ?? ""),
     imageUrl: String(formData.get("imageUrl") ?? ""),
     price: String(formData.get("price") ?? ""),
+    durationMinutes: String(formData.get("durationMinutes") ?? ""),
+    bufferBeforeMinutes: String(formData.get("bufferBeforeMinutes") ?? ""),
+    bufferAfterMinutes: String(formData.get("bufferAfterMinutes") ?? ""),
   })
 
   if (!parsed.success) {
@@ -179,11 +224,13 @@ export const updateAdminService = async (formData: FormData) => {
       description: parsed.data.description,
       imageUrl: resolveServiceImageUrl(parsed.data.imageUrl) ?? DEFAULT_SERVICE_IMAGE_URL,
       price,
+      durationMinutes: parsed.data.durationMinutes,
+      bufferBeforeMinutes: parsed.data.bufferBeforeMinutes,
+      bufferAfterMinutes: parsed.data.bufferAfterMinutes,
     },
   })
 
-  revalidatePath("/admin/services")
-  revalidatePath("/services")
+  revalidateServicePages()
 
   return {
     ok: true as const,
@@ -206,49 +253,33 @@ export const deleteAdminService = async (formData: FormData) => {
     }
   }
 
-  const todayStart = getBrasiliaTodayStart()
-
-  const serviceWithUpcomingScheduledBookings = await db.service.findUnique({
-    where: { id: parsedServiceId.data },
+  const service = await db.service.findUnique({
+    where: {
+      id: parsedServiceId.data,
+    },
     select: {
       id: true,
-      bookings: {
-        select: {
-          id: true,
-        },
-        where: {
-          status: "SCHEDULED",
-          date: {
-            gte: todayStart,
-          },
-        },
-        take: 1,
-      },
+      isActive: true,
     },
   })
 
-  if (serviceWithUpcomingScheduledBookings?.bookings.length) {
+  if (!service) {
     return {
       ok: false as const,
-      blockedServiceId: parsedServiceId.data,
-      message: "Exclua primeiro os agendamentos futuros vinculados a este servico.",
+      message: "Servico invalido.",
     }
   }
 
-  await db.$transaction(async (tx) => {
-    await tx.booking.deleteMany({
-      where: {
-        serviceId: parsedServiceId.data,
-      },
-    })
-
-    await tx.service.delete({
-      where: { id: parsedServiceId.data },
-    })
+  await db.service.update({
+    where: {
+      id: service.id,
+    },
+    data: {
+      isActive: false,
+    },
   })
 
-  revalidatePath("/admin/services")
-  revalidatePath("/services")
+  revalidateServicePages()
 
   return {
     ok: true as const,

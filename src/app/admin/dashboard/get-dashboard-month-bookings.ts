@@ -55,31 +55,27 @@ export const getDashboardMonthBookings = async ({
       status: {
         not: "CANCELED",
       },
-      date: {
+      startsAt: {
         gte: range.start,
         lt: range.end,
       },
     },
     select: {
       id: true,
-      date: true,
+      startsAt: true,
       status: true,
       cancellationRequested: true,
       customerName: true,
       customerPhone: true,
-      service: {
-        select: {
-          name: true,
-        },
-      },
+      serviceName: true,
     },
     orderBy: {
-      date: "asc",
+      startsAt: "asc",
     },
   })
 
   return bookings.map((booking) => {
-    const wallClockDate = toBrasiliaWallClock(booking.date)
+    const wallClockDate = toBrasiliaWallClock(booking.startsAt)
 
     return {
       id: booking.id,
@@ -89,7 +85,7 @@ export const getDashboardMonthBookings = async ({
       cancellationRequested: booking.cancellationRequested,
       customerName: booking.customerName,
       customerPhone: booking.customerPhone,
-      serviceName: booking.service.name,
+      serviceName: booking.serviceName,
     }
   })
 }

@@ -56,6 +56,9 @@ interface BookingFlowService {
   description: string
   imageUrl: string
   price: string
+  durationMinutes: number
+  bufferBeforeMinutes: number
+  bufferAfterMinutes: number
 }
 
 interface BookingFlowProps {
@@ -614,8 +617,13 @@ const ServiceStep = ({
                 <span className="mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-400 sm:text-sm">
                   {service.description}
                 </span>
-                <span className="mt-2 inline-flex rounded-full border border-brand-hover/30 bg-brand/10 px-3 py-1 text-xs font-bold text-brand-100">
-                  {currencyFormatter.format(Number(service.price))}
+                <span className="mt-2 flex flex-wrap gap-2">
+                  <span className="inline-flex rounded-full border border-brand-hover/30 bg-brand/10 px-3 py-1 text-xs font-bold text-brand-100">
+                    {currencyFormatter.format(Number(service.price))}
+                  </span>
+                  <span className="inline-flex rounded-full border border-zinc-700 bg-zinc-900/75 px-3 py-1 text-xs font-semibold text-zinc-300">
+                    {service.durationMinutes} min
+                  </span>
                 </span>
               </span>
             </button>
@@ -1092,13 +1100,13 @@ const BookingFlow = ({
     fetchRequestIdRef.current = requestId
 
     const fetchDayContext = async () => {
-      if (!selectedBarber || !selectedDay) {
+      if (!selectedBarber || !selectedService || !selectedDay) {
         setAvailableTimes([])
         setDayContextStatus("idle")
         return
       }
 
-      const cacheKey = `${selectedBarber.id}:${format(selectedDay, "yyyy-MM-dd")}`
+      const cacheKey = `${selectedBarber.id}:${selectedService.id}:${format(selectedDay, "yyyy-MM-dd")}`
       const cachedAvailableTimes = dayContextCacheRef.current[cacheKey]
 
       if (cachedAvailableTimes) {
@@ -1113,6 +1121,7 @@ const BookingFlow = ({
       try {
         const context = await getBookingDayContext({
           barberId: selectedBarber.id,
+          serviceId: selectedService.id,
           date: selectedDay,
         })
 
@@ -1139,7 +1148,7 @@ const BookingFlow = ({
     return () => {
       isMounted = false
     }
-  }, [selectedBarber, selectedDay])
+  }, [selectedBarber, selectedDay, selectedService])
 
   useEffect(() => {
     if (!selectedTime || dayContextStatus !== "loaded") {
@@ -1194,6 +1203,12 @@ const BookingFlow = ({
   }
 
   const handleSelectService = (serviceId: string) => {
+    if (selectedServiceId !== serviceId) {
+      setSelectedTime(undefined)
+      setAvailableTimes([])
+      setDayContextStatus(selectedDay ? "loading" : "idle")
+    }
+
     setSelectedServiceId(serviceId)
     setFlowError(null)
     setActiveStep("datetime")

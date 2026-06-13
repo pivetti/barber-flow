@@ -32,7 +32,7 @@ interface PublicBooking {
   status: string
   customerName: string
   customerPhone: string
-  date: Date
+  startsAt: Date
   cancellationRequested: boolean
   serviceName: string
   barberName: string | null
@@ -101,7 +101,7 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
               <p className="text-sm text-zinc-300">
                 Data:{" "}
                 <span className="font-semibold text-zinc-100">
-                  {format(new Date(booking.date), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })}
+                  {format(new Date(booking.startsAt), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })}
                 </span>
               </p>
               <p className="text-sm text-zinc-300">

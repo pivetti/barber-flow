@@ -6,12 +6,22 @@ import { z } from "zod"
 import {
   getBrasiliaDayOfWeek,
   getBrasiliaEndOfDay,
-  getBrasiliaStartOfDay,
   getBrasiliaTodayStart,
   isSameBrasiliaDay,
   toBrasiliaWallClock,
 } from "@/lib/brasilia-time"
+import {
+  addMinutes,
+  getBarberAvailableTimesForDate,
+  getOccupiedRange,
+  getServiceOccupiedRange,
+  intervalsOverlap,
+} from "@/lib/barber-schedule"
 import { customerNameSchema, idSchema, phoneSchema } from "@/lib/input-validation"
+import {
+  BOOKING_OVERLAP_ERROR_MESSAGE,
+  isBookingOverlapConstraintError,
+} from "@/lib/booking-overlap-constraint"
 import { db } from "@/lib/prisma"
 import { createPublicBookingSession } from "@/lib/public-booking-session"
 import { enforceRateLimit } from "@/lib/rate-limit"
@@ -25,8 +35,7 @@ interface CreateBookingParams {
   customerPhone: string
 }
 
-const DEFAULT_SLOT_INTERVAL_MINUTES = 30
-const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
+const BOOKING_CONFLICT_QUERY_PADDING_MINUTES = 24 * 60
 
 const getEasterDate = (year: number) => {
   const a = year % 19
@@ -81,19 +90,6 @@ const isSundayOrBrazilHoliday = (date: Date) => {
   )
 }
 
-const timeToMinutes = (time: string) => {
-  const [hours, minutes] = time.split(":").map(Number)
-  return hours * 60 + minutes
-}
-
-const isValidTimeRange = (startTime: string, endTime: string) => {
-  if (!timeRegex.test(startTime) || !timeRegex.test(endTime)) {
-    return false
-  }
-
-  return timeToMinutes(startTime) < timeToMinutes(endTime)
-}
-
 export const createBooking = async (params: CreateBookingParams) => {
   const ipAddress = await getRequestIp()
   await enforceRateLimit(ipAddress, "create-booking")
@@ -114,7 +110,6 @@ export const createBooking = async (params: CreateBookingParams) => {
 
   const { serviceId, barberId, date, customerName, customerPhone } = parsed.data
   const selectedTime = format(toBrasiliaWallClock(date), "HH:mm")
-  const selectedMinutes = timeToMinutes(selectedTime)
 
   const todayStart = getBrasiliaTodayStart()
   const maxBookingDate = getBrasiliaEndOfDay(addWeeks(todayStart, 4))
@@ -131,71 +126,26 @@ export const createBooking = async (params: CreateBookingParams) => {
     throw new Error("Nao e possivel agendar aos domingos e feriados nacionais")
   }
 
-  const dayStart = getBrasiliaStartOfDay(date)
-  const dayEnd = getBrasiliaEndOfDay(date)
-  const dayOfWeek = getBrasiliaDayOfWeek(date)
-
-  const [service, barber, workingHours, blockedTimes, settings, conflictingBooking] = await Promise.all([
+  const [service, barber] = await Promise.all([
     db.service.findUnique({
       where: { id: serviceId },
-      select: { id: true },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        durationMinutes: true,
+        bufferBeforeMinutes: true,
+        bufferAfterMinutes: true,
+        isActive: true,
+      },
     }),
     db.barber.findUnique({
       where: { id: barberId },
       select: { id: true, isActive: true },
     }),
-    db.workingHour.findMany({
-      where: {
-        barberId,
-        dayOfWeek,
-      },
-      orderBy: {
-        startTime: "asc",
-      },
-      select: {
-        startTime: true,
-        endTime: true,
-      },
-    }),
-    db.blockedTime.findMany({
-      where: {
-        barberId,
-        date: {
-          gte: dayStart,
-          lte: dayEnd,
-        },
-      },
-      orderBy: {
-        startTime: "asc",
-      },
-      select: {
-        startTime: true,
-        endTime: true,
-      },
-    }),
-    db.scheduleSettings.findUnique({
-      where: {
-        barberId,
-      },
-      select: {
-        slotIntervalMinutes: true,
-      },
-    }),
-    db.booking.findFirst({
-      where: {
-        barberId,
-        date,
-        status: {
-          not: "CANCELED",
-        },
-      },
-      select: {
-        id: true,
-      },
-    }),
   ])
 
-  if (!service) {
+  if (!service || !service.isActive) {
     throw new Error("Servico invalido")
   }
 
@@ -203,59 +153,89 @@ export const createBooking = async (params: CreateBookingParams) => {
     throw new Error("Barbeiro indisponivel")
   }
 
-  const slotIntervalMinutes = settings?.slotIntervalMinutes ?? DEFAULT_SLOT_INTERVAL_MINUTES
+  const serviceSchedule = {
+    durationMinutes: service.durationMinutes,
+    bufferBeforeMinutes: service.bufferBeforeMinutes,
+    bufferAfterMinutes: service.bufferAfterMinutes,
+  }
+  const availableTimes = await getBarberAvailableTimesForDate({
+    barberId,
+    date,
+    serviceSchedule,
+  })
 
-  const isWithinWorkingHours = workingHours.some((workingHour) => {
-    if (!isValidTimeRange(workingHour.startTime, workingHour.endTime)) {
-      return false
-    }
+  if (!availableTimes.includes(selectedTime)) {
+    throw new Error("Este horario esta indisponivel. Escolha outro.")
+  }
 
-    const startMinutes = timeToMinutes(workingHour.startTime)
-    const endMinutes = timeToMinutes(workingHour.endTime)
+  const { startsAt, endsAt, occupiedStart, occupiedEnd } = getServiceOccupiedRange({
+    startsAt: date,
+    durationMinutes: service.durationMinutes,
+    bufferBeforeMinutes: service.bufferBeforeMinutes,
+    bufferAfterMinutes: service.bufferAfterMinutes,
+  })
+  const possibleConflictingBookings = await db.booking.findMany({
+    where: {
+      barberId,
+      status: {
+        not: "CANCELED",
+      },
+      startsAt: {
+        lt: addMinutes(occupiedEnd, BOOKING_CONFLICT_QUERY_PADDING_MINUTES),
+      },
+      endsAt: {
+        gt: addMinutes(occupiedStart, -BOOKING_CONFLICT_QUERY_PADDING_MINUTES),
+      },
+    },
+    select: {
+      startsAt: true,
+      endsAt: true,
+      serviceBufferBeforeMinutes: true,
+      serviceBufferAfterMinutes: true,
+    },
+  })
+  const conflictingBooking = possibleConflictingBookings.some((booking) => {
+    const existingOccupiedRange = getOccupiedRange(booking)
 
-    return (
-      selectedMinutes >= startMinutes &&
-      selectedMinutes + slotIntervalMinutes <= endMinutes &&
-      (selectedMinutes - startMinutes) % slotIntervalMinutes === 0
+    return intervalsOverlap(
+      occupiedStart,
+      occupiedEnd,
+      existingOccupiedRange.occupiedStart,
+      existingOccupiedRange.occupiedEnd,
     )
   })
-
-  if (!isWithinWorkingHours) {
-    throw new Error("Este horario esta indisponivel. Escolha outro.")
-  }
-
-  const isBlocked = blockedTimes.some((blockedTime) => {
-    if (!isValidTimeRange(blockedTime.startTime, blockedTime.endTime)) {
-      return false
-    }
-
-    const startMinutes = timeToMinutes(blockedTime.startTime)
-    const endMinutes = timeToMinutes(blockedTime.endTime)
-
-    return selectedMinutes >= startMinutes && selectedMinutes < endMinutes
-  })
-
-  if (isBlocked) {
-    throw new Error("Este horario esta indisponivel. Escolha outro.")
-  }
 
   if (conflictingBooking) {
     throw new Error("Este horario ja esta agendado. Escolha outro.")
   }
 
-  const booking = await db.booking.create({
-    data: {
-      serviceId,
-      barberId,
-      date,
-      customerName,
-      customerPhone,
-      cancellationToken: `ct_${randomBytes(16).toString("hex")}`,
-    },
-    select: {
-      id: true,
-    },
-  })
+  const booking = await db.booking
+    .create({
+      data: {
+        serviceId,
+        serviceName: service.name,
+        servicePrice: service.price,
+        serviceDurationMinutes: service.durationMinutes,
+        serviceBufferBeforeMinutes: service.bufferBeforeMinutes,
+        serviceBufferAfterMinutes: service.bufferAfterMinutes,
+        barberId,
+        startsAt,
+        endsAt,
+        customerName,
+        customerPhone,
+        cancellationToken: `ct_${randomBytes(16).toString("hex")}`,
+      },
+      select: {
+        id: true,
+      },
+    })
+    .catch((error: unknown) => {
+      if (isBookingOverlapConstraintError(error)) {
+        throw new Error(BOOKING_OVERLAP_ERROR_MESSAGE)
+      }
+
+      throw error
+    })
 
   await createPublicBookingSession(booking.id)
 

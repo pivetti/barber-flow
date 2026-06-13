@@ -77,10 +77,6 @@ const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
       id: params.bookingId,
       barberId: admin.id,
     },
-    include: {
-      service: true,
-      barber: true,
-    },
   })
 
   if (!booking) {
@@ -149,8 +145,11 @@ const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
 
                 <div className="mt-3 inline-flex max-w-full items-center gap-2 rounded-2xl border border-zinc-700/80 bg-zinc-900/80 px-3 py-2 text-sm font-medium text-zinc-100 sm:text-base">
                   <Scissors className="h-4 w-4 shrink-0 text-zinc-300" />
-                  <span className="break-words">{booking.service.name}</span>
+                  <span className="break-words">{booking.serviceName}</span>
                 </div>
+                <p className="mt-2 text-xs font-medium text-zinc-500">
+                  {booking.serviceDurationMinutes} min
+                </p>
               </div>
             </div>
 
@@ -164,7 +163,10 @@ const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
                 </div>
 
                 <p className="mt-3 inline-flex h-11 min-w-[94px] items-center justify-center rounded-xl border border-brand/30 bg-brand/10 px-3 text-2xl font-semibold leading-none text-brand-100 sm:text-3xl">
-                  {format(toBrasiliaWallClock(booking.date), "HH:mm", { locale: ptBR })}
+                  {format(toBrasiliaWallClock(booking.startsAt), "HH:mm", { locale: ptBR })}
+                </p>
+                <p className="mt-2 text-xs text-zinc-500">
+                  Ate {format(toBrasiliaWallClock(booking.endsAt), "HH:mm", { locale: ptBR })}
                 </p>
               </div>
 
@@ -177,7 +179,7 @@ const BookingDetailPage = async ({ params }: BookingDetailPageProps) => {
                 </div>
 
                 <p className="mt-3 text-base font-semibold text-zinc-100 sm:text-lg">
-                  {format(toBrasiliaWallClock(booking.date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                  {format(toBrasiliaWallClock(booking.startsAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                 </p>
               </div>
 

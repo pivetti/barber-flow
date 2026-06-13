@@ -4,8 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
-
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
@@ -22,25 +20,37 @@ enum BarberRole {
   BARBER
 }
 
+enum BookingStatus {
+  SCHEDULED
+  DONE
+  CANCELED
+}
+
 model Service {
-  id          String    @id @default(uuid())
-  name        String
-  description String
-  imageUrl    String
-  price       Decimal   @db.Decimal(10, 2)
-  bookings    Booking[]
+  id                  String    @id @default(uuid())
+  name                String
+  description         String
+  imageUrl            String
+  price               Decimal   @db.Decimal(10, 2)
+  durationMinutes     Int       @default(30)
+  bufferBeforeMinutes Int       @default(0)
+  bufferAfterMinutes  Int       @default(0)
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  bookings            Booking[]
 }
 
 model Barber {
-  id              String              @id @default(uuid())
+  id              String               @id @default(uuid())
   name            String
-  email           String?             @unique
+  email           String?              @unique
   phone           String?
   password        String?
-  sessionVersion  Int                 @default(0)
+  sessionVersion  Int                  @default(0)
   imageUrl        String
-  role            BarberRole          @default(BARBER)
-  isActive        Boolean             @default(true)
+  role            BarberRole           @default(BARBER)
+  isActive        Boolean              @default(true)
   bookings        Booking[]
   availabilities  BarberAvailability[]
   blockedDays     BarberBlockedDay[]
@@ -48,27 +58,34 @@ model Barber {
   workingHours    WorkingHour[]
   blockedTimes    BlockedTime[]
   scheduleSetting ScheduleSettings?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 }
 
 model Booking {
-  id                      String   @id @default(uuid())
-  customerName            String
-  customerPhone           String
-  cancellationToken       String   @unique
-  cancellationRequested   Boolean  @default(false)
-  cancellationRequestedAt DateTime?
-  status                  String   @default("SCHEDULED")
-  serviceId               String
-  barberId                String
-  barber                  Barber   @relation(fields: [barberId], references: [id], onDelete: Restrict)
-  date                    DateTime
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-  service                 Service  @relation(fields: [serviceId], references: [id])
+  id                         String        @id @default(uuid())
+  customerName               String
+  customerPhone              String
+  cancellationToken          String        @unique
+  cancellationRequested      Boolean       @default(false)
+  cancellationRequestedAt    DateTime?
+  status                     BookingStatus @default(SCHEDULED)
+  serviceId                  String
+  serviceName                String
+  servicePrice               Decimal       @db.Decimal(10, 2)
+  serviceDurationMinutes     Int
+  serviceBufferBeforeMinutes Int           @default(0)
+  serviceBufferAfterMinutes  Int           @default(0)
+  barberId                   String
+  barber                     Barber        @relation(fields: [barberId], references: [id], onDelete: Restrict)
+  startsAt                   DateTime
+  endsAt                     DateTime
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+  service                    Service       @relation(fields: [serviceId], references: [id])
 
-  @@index([barberId, date])
+  @@index([barberId, startsAt])
+  @@index([barberId, endsAt])
   @@index([barberId, status])
 }
 
@@ -153,29 +170,29 @@ model ScheduleSettings {
 }
 
 model AdminLoginAttempt {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   email           String
   ipAddress       String
-  failedAttempts  Int      @default(0)
+  failedAttempts  Int       @default(0)
   windowStartedAt DateTime
   blockedUntil    DateTime?
-  lastAttemptAt   DateTime @default(now())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  lastAttemptAt   DateTime  @default(now())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@unique([email, ipAddress])
   @@index([blockedUntil])
 }
 
 model RateLimitAttempt {
-  id              String   @id @default(uuid())
+  id              String    @id @default(uuid())
   ipAddress       String
   route           String
-  attemptCount    Int      @default(0)
+  attemptCount    Int       @default(0)
   windowStartedAt DateTime
   blockedUntil    DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@unique([ipAddress, route])
   @@index([blockedUntil])

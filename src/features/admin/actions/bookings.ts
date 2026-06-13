@@ -1,9 +1,22 @@
 "use server"
 
+import { Prisma } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 import { canManageBookings } from "@/lib/admin-permissions"
+import {
+  addMinutes,
+  getBarberAvailableTimesForDate,
+} from "@/lib/barber-schedule"
+import {
+  BOOKING_OVERLAP_ERROR_MESSAGE,
+  isBookingOverlapConstraintError,
+} from "@/lib/booking-overlap-constraint"
+import {
+  createUtcDateFromBrasiliaParts,
+  getBrasiliaDateParts,
+} from "@/lib/brasilia-time"
 import {
   adminReturnToSchema,
   customerNameSchema,
@@ -18,6 +31,15 @@ import { requireAdmin } from "@/lib/require-admin"
 
 const editableBookingFields = ["client", "service", "time", "date"] as const
 const editableBookingFieldSchema = z.enum(editableBookingFields)
+
+type EditableBookingSchedule = {
+  id: string
+  startsAt: Date
+  status: "SCHEDULED" | "DONE" | "CANCELED"
+  serviceDurationMinutes: number
+  serviceBufferBeforeMinutes: number
+  serviceBufferAfterMinutes: number
+}
 
 const revalidateAdminBookingPaths = (bookingId: string) => {
   revalidatePath("/admin/bookings")
@@ -39,10 +61,111 @@ const parseActionBasePayload = (formData: FormData) => {
     })
 }
 
-const parseDateFromInput = (value: string) => {
+const parseDatePartsFromInput = (value: string) => {
   const [year, month, day] = value.split("-").map(Number)
-  const date = new Date(year, month - 1, day, 0, 0, 0, 0)
-  return Number.isNaN(date.getTime()) ? null : date
+  const date = createUtcDateFromBrasiliaParts(year, month, day)
+  if (Number.isNaN(date.getTime())) {
+    return null
+  }
+
+  return { year, month, day }
+}
+
+const getBrasiliaTimeLabel = (date: Date) => {
+  const { hours, minutes } = getBrasiliaDateParts(date)
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`
+}
+
+const buildStartsAtWithTime = (startsAt: Date, time: string) => {
+  const { year, month, day } = getBrasiliaDateParts(startsAt)
+  const [hours, minutes] = time.split(":").map(Number)
+  return createUtcDateFromBrasiliaParts(year, month, day, hours, minutes)
+}
+
+const buildStartsAtWithDate = (startsAt: Date, dateInput: string) => {
+  const dateParts = parseDatePartsFromInput(dateInput)
+  if (!dateParts) {
+    return null
+  }
+
+  const { hours, minutes } = getBrasiliaDateParts(startsAt)
+  return createUtcDateFromBrasiliaParts(
+    dateParts.year,
+    dateParts.month,
+    dateParts.day,
+    hours,
+    minutes,
+  )
+}
+
+const updateBookingScheduleForAdmin = async ({
+  booking,
+  adminId,
+  data,
+}: {
+  booking: EditableBookingSchedule
+  adminId: string
+  data: {
+    startsAt?: Date
+    serviceId?: string
+    serviceName?: string
+    servicePrice?: Prisma.Decimal
+    serviceDurationMinutes?: number
+    serviceBufferBeforeMinutes?: number
+    serviceBufferAfterMinutes?: number
+  }
+}) => {
+  const startsAt = data.startsAt ?? booking.startsAt
+  const serviceDurationMinutes =
+    data.serviceDurationMinutes ?? booking.serviceDurationMinutes
+  const serviceBufferBeforeMinutes =
+    data.serviceBufferBeforeMinutes ?? booking.serviceBufferBeforeMinutes
+  const serviceBufferAfterMinutes =
+    data.serviceBufferAfterMinutes ?? booking.serviceBufferAfterMinutes
+  const endsAt = addMinutes(startsAt, serviceDurationMinutes)
+
+  if (booking.status !== "CANCELED") {
+    const availableTimes = await getBarberAvailableTimesForDate({
+      barberId: adminId,
+      date: startsAt,
+      serviceSchedule: {
+        durationMinutes: serviceDurationMinutes,
+        bufferBeforeMinutes: serviceBufferBeforeMinutes,
+        bufferAfterMinutes: serviceBufferAfterMinutes,
+      },
+      excludeBookingId: booking.id,
+      includeInactiveService: true,
+    })
+
+    if (!availableTimes.includes(getBrasiliaTimeLabel(startsAt))) {
+      return false
+    }
+  }
+
+  const result = await db.booking
+    .updateMany({
+      where: {
+        id: booking.id,
+        barberId: adminId,
+      },
+      data: {
+        ...data,
+        startsAt,
+        endsAt,
+        serviceDurationMinutes,
+        serviceBufferBeforeMinutes,
+        serviceBufferAfterMinutes,
+      },
+    })
+    .catch((error: unknown) => {
+      if (isBookingOverlapConstraintError(error)) {
+        throw new Error(BOOKING_OVERLAP_ERROR_MESSAGE)
+      }
+
+      throw error
+    })
+
+  return result.count === 1
 }
 
 const updateBookingStatusForAdmin = async ({
@@ -266,7 +389,11 @@ export const updateAdminBookingField = async (formData: FormData) => {
     },
     select: {
       id: true,
-      date: true,
+      startsAt: true,
+      status: true,
+      serviceDurationMinutes: true,
+      serviceBufferBeforeMinutes: true,
+      serviceBufferAfterMinutes: true,
     },
   })
 
@@ -317,6 +444,11 @@ export const updateAdminBookingField = async (formData: FormData) => {
       },
       select: {
         id: true,
+        name: true,
+        price: true,
+        durationMinutes: true,
+        bufferBeforeMinutes: true,
+        bufferAfterMinutes: true,
       },
     })
 
@@ -324,17 +456,20 @@ export const updateAdminBookingField = async (formData: FormData) => {
       return
     }
 
-    const result = await db.booking.updateMany({
-      where: {
-        id: parsedHeader.data.bookingId,
-        barberId: admin.id,
-      },
+    const updated = await updateBookingScheduleForAdmin({
+      booking,
+      adminId: admin.id,
       data: {
         serviceId: service.id,
+        serviceName: service.name,
+        servicePrice: service.price,
+        serviceDurationMinutes: service.durationMinutes,
+        serviceBufferBeforeMinutes: service.bufferBeforeMinutes,
+        serviceBufferAfterMinutes: service.bufferAfterMinutes,
       },
     })
 
-    if (result.count !== 1) {
+    if (!updated) {
       return
     }
   }
@@ -345,21 +480,17 @@ export const updateAdminBookingField = async (formData: FormData) => {
       return
     }
 
-    const [hours, minutes] = parsedTime.data.split(":").map(Number)
-    const nextDate = new Date(booking.date)
-    nextDate.setHours(hours, minutes, 0, 0)
+    const nextStartsAt = buildStartsAtWithTime(booking.startsAt, parsedTime.data)
 
-    const result = await db.booking.updateMany({
-      where: {
-        id: parsedHeader.data.bookingId,
-        barberId: admin.id,
-      },
+    const updated = await updateBookingScheduleForAdmin({
+      booking,
+      adminId: admin.id,
       data: {
-        date: nextDate,
+        startsAt: nextStartsAt,
       },
     })
 
-    if (result.count !== 1) {
+    if (!updated) {
       return
     }
   }
@@ -370,24 +501,20 @@ export const updateAdminBookingField = async (formData: FormData) => {
       return
     }
 
-    const nextDate = parseDateFromInput(parsedDate.data)
-    if (!nextDate) {
+    const nextStartsAt = buildStartsAtWithDate(booking.startsAt, parsedDate.data)
+    if (!nextStartsAt) {
       return
     }
 
-    nextDate.setHours(booking.date.getHours(), booking.date.getMinutes(), 0, 0)
-
-    const result = await db.booking.updateMany({
-      where: {
-        id: parsedHeader.data.bookingId,
-        barberId: admin.id,
-      },
+    const updated = await updateBookingScheduleForAdmin({
+      booking,
+      adminId: admin.id,
       data: {
-        date: nextDate,
+        startsAt: nextStartsAt,
       },
     })
 
-    if (result.count !== 1) {
+    if (!updated) {
       return
     }
   }

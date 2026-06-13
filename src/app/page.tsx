@@ -26,6 +26,9 @@ const Home = async () => {
       },
     }),
     db.service.findMany({
+      where: {
+        isActive: true,
+      },
       orderBy: {
         name: "asc",
       },
@@ -35,6 +38,9 @@ const Home = async () => {
         description: true,
         imageUrl: true,
         price: true,
+        durationMinutes: true,
+        bufferBeforeMinutes: true,
+        bufferAfterMinutes: true,
       },
     }),
   ])
@@ -51,6 +57,9 @@ const Home = async () => {
     description: service.description,
     imageUrl: getSafePublicImagePath(service.imageUrl, "/logo-jesi.png"),
     price: service.price.toString(),
+    durationMinutes: service.durationMinutes,
+    bufferBeforeMinutes: service.bufferBeforeMinutes,
+    bufferAfterMinutes: service.bufferAfterMinutes,
   }))
 
   return (

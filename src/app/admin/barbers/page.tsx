@@ -18,7 +18,40 @@ const roleLabelMap = {
   BARBER: "Barber",
 } as const
 
-const BarbersAdminPage = async () => {
+interface BarbersAdminPageProps {
+  searchParams?: {
+    barberAction?: string
+  }
+}
+
+const actionMessageMap: Record<
+  string,
+  { className: string; title: string; description: string }
+> = {
+  "deactivated-with-history": {
+    className: "border-amber-500/35 bg-amber-500/10 text-amber-100",
+    title: "Barbeiro desativado",
+    description:
+      "Este barbeiro possui agendamentos vinculados, por isso foi desativado para preservar o histórico.",
+  },
+  deleted: {
+    className: "border-emerald-500/35 bg-emerald-500/10 text-emerald-100",
+    title: "Barbeiro excluido",
+    description: "O barbeiro foi removido porque nao havia agendamentos vinculados.",
+  },
+  invalid: {
+    className: "border-red-500/35 bg-red-500/10 text-red-100",
+    title: "Barbeiro invalido",
+    description: "Nao foi possivel encontrar o barbeiro informado.",
+  },
+  "not-allowed": {
+    className: "border-red-500/35 bg-red-500/10 text-red-100",
+    title: "Acao nao permitida",
+    description: "Voce nao tem permissao para excluir ou desativar este barbeiro.",
+  },
+}
+
+const BarbersAdminPage = async ({ searchParams }: BarbersAdminPageProps) => {
   const admin = await requireAdmin()
 
   if (!canManageBarbers(admin.role)) {
@@ -36,6 +69,9 @@ const BarbersAdminPage = async () => {
       isActive: true,
     },
   })
+  const actionMessage = searchParams?.barberAction
+    ? actionMessageMap[searchParams.barberAction]
+    : null
 
   return (
     <>
@@ -62,6 +98,13 @@ const BarbersAdminPage = async () => {
         </section>
 
         <section className="mt-5 rounded-3xl border border-zinc-800/65 bg-zinc-950/45 p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.24)] sm:mt-6 sm:p-5">
+          {actionMessage && (
+            <div className={`mb-4 rounded-2xl border p-4 text-sm ${actionMessage.className}`}>
+              <p className="font-semibold">{actionMessage.title}</p>
+              <p className="mt-1 opacity-85">{actionMessage.description}</p>
+            </div>
+          )}
+
           <div className="space-y-3">
             {barbers.map((barber) => {
               const canEdit = canEditBarber(admin, barber.role)

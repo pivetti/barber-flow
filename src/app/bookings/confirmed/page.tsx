@@ -32,14 +32,14 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
     notFound()
   }
 
-  const formattedDate = format(toBrasiliaWallClock(booking.date), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })
+  const formattedDate = format(toBrasiliaWallClock(booking.startsAt), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })
   const barberWhatsappPhone = normalizeWhatsappPhone(booking.barber?.phone ?? "")
   const managementUrl = `${getAppEnv().NEXT_PUBLIC_APP_URL}/manage?token=${encodeURIComponent(booking.cancellationToken)}`
   const receiptMessage = [
     "💈 *Comprovante de Agendamento*",
     "",
     `👤 Cliente: ${booking.customerName}`,
-    `✂️ Serviço: ${booking.service.name}`,
+    `✂️ Serviço: ${booking.serviceName}`,
     `💇 Barbeiro: ${booking.barber?.name ?? "Barbeiro"}`,
     `📅 Data: ${formattedDate}`,
     "",
@@ -60,7 +60,7 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
             {booking.customerName}, seu horario foi reservado com sucesso.
           </p>
           <p className="mt-1 text-sm text-zinc-400">
-            {booking.service.name} com {booking.barber?.name ?? "barbeiro"} em{" "}
+            {booking.serviceName} com {booking.barber?.name ?? "barbeiro"} em{" "}
             {formattedDate}.
           </p>
         </section>

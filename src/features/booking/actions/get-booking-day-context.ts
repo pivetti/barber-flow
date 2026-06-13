@@ -8,10 +8,15 @@ import { getBarberAvailableTimesForDate } from "@/lib/barber-schedule"
 
 interface GetBookingDayContextProps {
   barberId: string
+  serviceId: string
   date: Date
 }
 
-export const getBookingDayContext = async ({ barberId, date }: GetBookingDayContextProps) => {
+export const getBookingDayContext = async ({
+  barberId,
+  serviceId,
+  date,
+}: GetBookingDayContextProps) => {
   try {
     const ipAddress = await getRequestIp()
     await enforceRateLimit(ipAddress, "get-booking-day-context")
@@ -28,9 +33,10 @@ export const getBookingDayContext = async ({ barberId, date }: GetBookingDayCont
   const parsed = z
     .object({
       barberId: idSchema,
+      serviceId: idSchema,
       date: z.date(),
     })
-    .safeParse({ barberId, date })
+    .safeParse({ barberId, serviceId, date })
 
   if (!parsed.success) {
     return {
@@ -40,6 +46,7 @@ export const getBookingDayContext = async ({ barberId, date }: GetBookingDayCont
 
   const availableTimes = await getBarberAvailableTimesForDate({
     barberId: parsed.data.barberId,
+    serviceId: parsed.data.serviceId,
     date: parsed.data.date,
   })
 

@@ -82,7 +82,7 @@ const BookingEditPage = async ({ params, searchParams }: BookingEditPageProps) =
     notFound()
   }
 
-  const bookingDateInBrasilia = toBrasiliaWallClock(booking.date)
+  const bookingDateInBrasilia = toBrasiliaWallClock(booking.startsAt)
   const defaultDate = format(bookingDateInBrasilia, "yyyy-MM-dd")
   const defaultTime = format(bookingDateInBrasilia, "HH:mm")
 
@@ -166,6 +166,7 @@ const BookingEditPage = async ({ params, searchParams }: BookingEditPageProps) =
                     {services.map((service) => (
                       <option key={service.id} value={service.id}>
                         {service.name}
+                        {!service.isActive ? " (inativo)" : ""}
                       </option>
                     ))}
                   </select>

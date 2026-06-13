@@ -30,6 +30,12 @@ const EditBarberPage = async ({ params }: EditBarberPageProps) => {
       phone: true,
       imageUrl: true,
       role: true,
+      isActive: true,
+      _count: {
+        select: {
+          bookings: true,
+        },
+      },
     },
   })
 
@@ -42,6 +48,13 @@ const EditBarberPage = async ({ params }: EditBarberPageProps) => {
   }
 
   const canDelete = canDeleteBarber(admin, barber.role, barber.id)
+  const bookingsCount = barber._count.bookings
+  const shouldDeactivateToPreserveHistory = bookingsCount > 0
+  const destructiveActionLabel = shouldDeactivateToPreserveHistory
+    ? barber.isActive
+      ? "Desativar barbeiro"
+      : "Barbeiro inativo"
+    : "Excluir barbeiro"
 
   return (
     <>
@@ -115,16 +128,30 @@ const EditBarberPage = async ({ params }: EditBarberPageProps) => {
             <div className="rounded-2xl border border-red-500/20 bg-zinc-950/70 p-4 sm:p-5">
               <div className="space-y-1.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-red-300/80">Zona de risco</p>
-                <h2 className="text-lg font-semibold text-zinc-50">Excluir barbeiro</h2>
+                <h2 className="text-lg font-semibold text-zinc-50">
+                  {shouldDeactivateToPreserveHistory ? "Desativar barbeiro" : "Excluir barbeiro"}
+                </h2>
                 <p className="text-sm leading-relaxed text-zinc-400">
-                  Esta acao remove permanentemente o barbeiro. A exclusao sera bloqueada se houver agendamentos vinculados.
+                  {shouldDeactivateToPreserveHistory
+                    ? "Este barbeiro possui agendamentos vinculados. Para preservar o historico, ele sera desativado e deixara de aparecer no agendamento publico."
+                    : "Este barbeiro nao possui agendamentos vinculados e pode ser removido permanentemente."}
                 </p>
+                {shouldDeactivateToPreserveHistory && (
+                  <p className="text-xs font-medium text-amber-200">
+                    {bookingsCount} agendamento(s) vinculado(s).
+                  </p>
+                )}
               </div>
 
               <form action={deleteBarber} className="mt-4">
                 <input type="hidden" name="barberId" value={barber.id} />
-                <Button type="submit" variant="destructive" className="rounded-xl">
-                  Excluir barbeiro
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  className="rounded-xl"
+                  disabled={shouldDeactivateToPreserveHistory && !barber.isActive}
+                >
+                  {destructiveActionLabel}
                 </Button>
               </form>
             </div>

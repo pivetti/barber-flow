@@ -90,7 +90,6 @@ export const getPublicBookingFromSession = async () => {
   const booking = await db.booking.findUnique({
     where: { id: bookingId },
     include: {
-      service: true,
       barber: true,
     },
   })

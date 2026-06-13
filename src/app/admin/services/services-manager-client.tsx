@@ -15,6 +15,10 @@ export interface AdminServiceItem {
   description: string
   imageUrl: string
   price: string
+  durationMinutes: string
+  bufferBeforeMinutes: string
+  bufferAfterMinutes: string
+  isActive: boolean
 }
 
 interface ServicesManagerClientProps {
@@ -26,6 +30,9 @@ interface ServiceFormState {
   price: string
   description: string
   imageUrl: string
+  durationMinutes: string
+  bufferBeforeMinutes: string
+  bufferAfterMinutes: string
 }
 
 type PendingAction =
@@ -39,7 +46,12 @@ const emptyServiceForm: ServiceFormState = {
   price: "",
   description: "",
   imageUrl: "",
+  durationMinutes: "30",
+  bufferBeforeMinutes: "0",
+  bufferAfterMinutes: "0",
 }
+const durationOptions = ["10", "15", "20", "30", "45", "60", "75", "90", "120"]
+const bufferOptions = ["0", "5", "10", "15", "20", "30"]
 
 const sortServices = (services: AdminServiceItem[]) => {
   return [...services].sort((left, right) => left.name.localeCompare(right.name))
@@ -56,6 +68,9 @@ const createServiceFormData = (service: ServiceFormState, serviceId?: string) =>
   formData.set("price", service.price)
   formData.set("description", service.description)
   formData.set("imageUrl", service.imageUrl)
+  formData.set("durationMinutes", service.durationMinutes)
+  formData.set("bufferBeforeMinutes", service.bufferBeforeMinutes)
+  formData.set("bufferAfterMinutes", service.bufferAfterMinutes)
 
   return formData
 }
@@ -149,7 +164,7 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
       return
     }
 
-    const confirmed = window.confirm(`Excluir o servico "${service.name}"?`)
+    const confirmed = window.confirm(`Desativar o servico "${service.name}"?`)
 
     if (!confirmed) {
       return
@@ -169,9 +184,16 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
       }
 
       setServices((currentServices) =>
-        currentServices.filter((currentService) => currentService.id !== service.id),
+        currentServices.map((currentService) =>
+          currentService.id === service.id
+            ? {
+                ...currentService,
+                isActive: false,
+              }
+            : currentService,
+        ),
       )
-      toast.success("Servico excluido com sucesso.")
+      toast.success("Servico desativado com sucesso.")
       router.refresh()
     } catch {
       toast.error("Nao foi possivel excluir o servico.")
@@ -204,6 +226,66 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
               onChange={(event) => setNewService((service) => ({ ...service, price: event.target.value }))}
               className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
             />
+            <label className="space-y-1.5">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                Duracao
+              </span>
+              <select
+                name="durationMinutes"
+                value={newService.durationMinutes}
+                disabled={pendingCreate}
+                onChange={(event) =>
+                  setNewService((service) => ({ ...service, durationMinutes: event.target.value }))
+                }
+                className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+              >
+                {durationOptions.map((duration) => (
+                  <option key={duration} value={duration}>
+                    {duration} min
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1.5">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                Buffer antes
+              </span>
+              <select
+                name="bufferBeforeMinutes"
+                value={newService.bufferBeforeMinutes}
+                disabled={pendingCreate}
+                onChange={(event) =>
+                  setNewService((service) => ({ ...service, bufferBeforeMinutes: event.target.value }))
+                }
+                className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+              >
+                {bufferOptions.map((buffer) => (
+                  <option key={buffer} value={buffer}>
+                    {buffer} min
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1.5">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                Buffer depois
+              </span>
+              <select
+                name="bufferAfterMinutes"
+                value={newService.bufferAfterMinutes}
+                disabled={pendingCreate}
+                onChange={(event) =>
+                  setNewService((service) => ({ ...service, bufferAfterMinutes: event.target.value }))
+                }
+                className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+              >
+                {bufferOptions.map((buffer) => (
+                  <option key={buffer} value={buffer}>
+                    {buffer} min
+                  </option>
+                ))}
+              </select>
+            </label>
             <Input
               name="description"
               placeholder="Descricao (opcional)"
@@ -212,7 +294,7 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
               onChange={(event) =>
                 setNewService((service) => ({ ...service, description: event.target.value }))
               }
-              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
+              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
             />
             <Input
               name="imageUrl"
@@ -263,9 +345,26 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                 onSubmit={(event) => void handleUpdateService(event, service)}
                 className={cn(
                   "rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[0_16px_30px_rgba(0,0,0,0.28)]",
+                  !service.isActive && "border-zinc-700/70 opacity-75",
                   cardIsPending && "opacity-80",
                 )}
               >
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <span
+                    className={cn(
+                      "inline-flex rounded-full border px-3 py-1 text-xs font-semibold",
+                      service.isActive
+                        ? "border-emerald-500/35 bg-emerald-500/10 text-emerald-200"
+                        : "border-zinc-700 bg-zinc-900/70 text-zinc-400",
+                    )}
+                  >
+                    {service.isActive ? "Ativo" : "Inativo"}
+                  </span>
+                  <span className="text-xs text-zinc-500">
+                    {service.durationMinutes} min
+                  </span>
+                </div>
+
                 <div className="grid gap-3 md:grid-cols-2">
                   <Input
                     name="name"
@@ -283,6 +382,66 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                     onChange={(event) => updateServiceField(service.id, "price", event.target.value)}
                     className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
                   />
+                  <label className="space-y-1.5">
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                      Duracao
+                    </span>
+                    <select
+                      name="durationMinutes"
+                      value={service.durationMinutes}
+                      disabled={cardIsPending}
+                      onChange={(event) =>
+                        updateServiceField(service.id, "durationMinutes", event.target.value)
+                      }
+                      className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+                    >
+                      {durationOptions.map((duration) => (
+                        <option key={duration} value={duration}>
+                          {duration} min
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="space-y-1.5">
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                      Buffer antes
+                    </span>
+                    <select
+                      name="bufferBeforeMinutes"
+                      value={service.bufferBeforeMinutes}
+                      disabled={cardIsPending}
+                      onChange={(event) =>
+                        updateServiceField(service.id, "bufferBeforeMinutes", event.target.value)
+                      }
+                      className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+                    >
+                      {bufferOptions.map((buffer) => (
+                        <option key={buffer} value={buffer}>
+                          {buffer} min
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="space-y-1.5 md:col-span-2">
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+                      Buffer depois
+                    </span>
+                    <select
+                      name="bufferAfterMinutes"
+                      value={service.bufferAfterMinutes}
+                      disabled={cardIsPending}
+                      onChange={(event) =>
+                        updateServiceField(service.id, "bufferAfterMinutes", event.target.value)
+                      }
+                      className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+                    >
+                      {bufferOptions.map((buffer) => (
+                        <option key={buffer} value={buffer}>
+                          {buffer} min
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <Input
                     name="description"
                     value={service.description}
@@ -322,19 +481,19 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                   </Button>
                   <button
                     type="button"
-                    disabled={cardIsPending}
+                    disabled={cardIsPending || !service.isActive}
                     onClick={() => void handleDeleteService(service)}
                     className="inline-flex h-10 items-center justify-center rounded-xl border border-red-500/35 bg-red-500/12 px-4 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/20 disabled:pointer-events-none disabled:opacity-50"
                   >
                     {isDeleting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Excluindo...
+                        Desativando...
                       </>
                     ) : (
                       <>
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Excluir
+                        {service.isActive ? "Desativar" : "Inativo"}
                       </>
                     )}
                   </button>

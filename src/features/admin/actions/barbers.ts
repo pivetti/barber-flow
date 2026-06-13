@@ -98,6 +98,7 @@ const resolveBarberImageUrl = (value?: string) => {
 
 const revalidateBarberPages = () => {
   revalidatePath("/")
+  revalidatePath("/agendar")
   revalidatePath("/barbers")
   revalidatePath("/bookings")
   revalidatePath("/sobre-nos")
@@ -327,7 +328,7 @@ export const deleteBarber = async (formData: FormData) => {
 
   const parsedBarberId = idSchema.safeParse(String(formData.get("barberId") ?? ""))
   if (!parsedBarberId.success) {
-    throw new Error("Invalid barber")
+    redirect("/admin/barbers?barberAction=invalid")
   }
 
   const barberId = parsedBarberId.data
@@ -341,11 +342,11 @@ export const deleteBarber = async (formData: FormData) => {
   })
 
   if (!target) {
-    throw new Error("Barber not found")
+    redirect("/admin/barbers?barberAction=invalid")
   }
 
   if (!canDeleteBarber(admin, target.role, target.id)) {
-    throw new Error("Not authorized to delete this barber")
+    redirect("/admin/barbers?barberAction=not-allowed")
   }
 
   const bookingsCount = await db.booking.count({
@@ -355,7 +356,16 @@ export const deleteBarber = async (formData: FormData) => {
   })
 
   if (bookingsCount > 0) {
-    throw new Error("Nao e possivel excluir um barbeiro com agendamentos vinculados")
+    await db.barber.update({
+      where: { id: target.id },
+      data: {
+        isActive: false,
+      },
+    })
+
+    revalidateBarberPages()
+    revalidatePath(`/admin/barbers/${target.id}/edit`)
+    redirect("/admin/barbers?barberAction=deactivated-with-history")
   }
 
   await db.barber.delete({
@@ -364,5 +374,5 @@ export const deleteBarber = async (formData: FormData) => {
 
   revalidateBarberPages()
   revalidatePath(`/admin/barbers/${target.id}/edit`)
-  redirect("/admin/barbers")
+  redirect("/admin/barbers?barberAction=deleted")
 }
