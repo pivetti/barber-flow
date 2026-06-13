@@ -11,6 +11,9 @@ export interface DashboardMonthBooking {
   id: string
   dateKey: string
   time: string
+  endTime: string
+  startsAtIso: string
+  endsAtIso: string
   status: string
   cancellationRequested: boolean
   customerName: string
@@ -63,6 +66,7 @@ export const getDashboardMonthBookings = async ({
     select: {
       id: true,
       startsAt: true,
+      endsAt: true,
       status: true,
       cancellationRequested: true,
       customerName: true,
@@ -75,12 +79,16 @@ export const getDashboardMonthBookings = async ({
   })
 
   return bookings.map((booking) => {
-    const wallClockDate = toBrasiliaWallClock(booking.startsAt)
+    const wallClockStart = toBrasiliaWallClock(booking.startsAt)
+    const wallClockEnd = toBrasiliaWallClock(booking.endsAt)
 
     return {
       id: booking.id,
-      dateKey: format(wallClockDate, "yyyy-MM-dd"),
-      time: format(wallClockDate, "HH:mm"),
+      dateKey: format(wallClockStart, "yyyy-MM-dd"),
+      time: format(wallClockStart, "HH:mm"),
+      endTime: format(wallClockEnd, "HH:mm"),
+      startsAtIso: booking.startsAt.toISOString(),
+      endsAtIso: booking.endsAt.toISOString(),
       status: booking.status,
       cancellationRequested: booking.cancellationRequested,
       customerName: booking.customerName,

@@ -66,6 +66,7 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
           bookings={bookings}
           initialDateKey={initialDateKey}
           todayKey={todayKey}
+          initialNowIso={new Date().toISOString()}
         />
 
         <footer className="mt-5 rounded-2xl border border-zinc-800/55 bg-zinc-950/35 px-4 py-3 text-xs text-zinc-500 sm:mt-6">
