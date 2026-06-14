@@ -30,7 +30,6 @@ const priceInputSchema = z
   .transform((value) => value.replace(",", ".").trim())
   .pipe(z.string().regex(/^\d+(\.\d{1,2})?$/).max(16))
 const allowedServiceDurationMinutes = [10, 15, 20, 30, 45, 60, 75, 90, 120] as const
-const allowedServiceBufferMinutes = [0, 5, 10, 15, 20, 30] as const
 const serviceDurationInputSchema = z
   .string()
   .transform((value) => value.trim())
@@ -40,15 +39,6 @@ const serviceDurationInputSchema = z
     (value) => allowedServiceDurationMinutes.includes(value as (typeof allowedServiceDurationMinutes)[number]),
     "Invalid duration",
   )
-const serviceBufferInputSchema = z
-  .string()
-  .transform((value) => value.trim())
-  .transform((value) => (value.length === 0 ? 0 : Number(value)))
-  .refine((value) => Number.isInteger(value), "Invalid buffer")
-  .refine(
-    (value) => allowedServiceBufferMinutes.includes(value as (typeof allowedServiceBufferMinutes)[number]),
-    "Invalid buffer",
-  )
 
 const createServiceSchema = z.object({
   name: serviceNameSchema,
@@ -56,8 +46,6 @@ const createServiceSchema = z.object({
   imageUrl: serviceImageInputSchema,
   price: priceInputSchema,
   durationMinutes: serviceDurationInputSchema,
-  bufferBeforeMinutes: serviceBufferInputSchema,
-  bufferAfterMinutes: serviceBufferInputSchema,
 })
 
 const updateServiceSchema = createServiceSchema.extend({
@@ -109,8 +97,6 @@ const serializeService = (service: {
   imageUrl: string
   price: { toString(): string }
   durationMinutes: number
-  bufferBeforeMinutes: number
-  bufferAfterMinutes: number
   isActive: boolean
 }) => ({
   id: service.id,
@@ -119,8 +105,6 @@ const serializeService = (service: {
   imageUrl: service.imageUrl,
   price: service.price.toString(),
   durationMinutes: String(service.durationMinutes),
-  bufferBeforeMinutes: String(service.bufferBeforeMinutes),
-  bufferAfterMinutes: String(service.bufferAfterMinutes),
   isActive: service.isActive,
 })
 
@@ -137,8 +121,6 @@ export const createAdminService = async (formData: FormData) => {
     imageUrl: String(formData.get("imageUrl") ?? ""),
     price: String(formData.get("price") ?? ""),
     durationMinutes: String(formData.get("durationMinutes") ?? ""),
-    bufferBeforeMinutes: String(formData.get("bufferBeforeMinutes") ?? ""),
-    bufferAfterMinutes: String(formData.get("bufferAfterMinutes") ?? ""),
   })
 
   if (!parsed.success) {
@@ -166,8 +148,8 @@ export const createAdminService = async (formData: FormData) => {
       imageUrl: resolveServiceImageUrl(parsed.data.imageUrl) ?? DEFAULT_SERVICE_IMAGE_URL,
       price,
       durationMinutes: parsed.data.durationMinutes,
-      bufferBeforeMinutes: parsed.data.bufferBeforeMinutes,
-      bufferAfterMinutes: parsed.data.bufferAfterMinutes,
+      bufferBeforeMinutes: 0,
+      bufferAfterMinutes: 0,
     },
   })
 
@@ -193,8 +175,6 @@ export const updateAdminService = async (formData: FormData) => {
     imageUrl: String(formData.get("imageUrl") ?? ""),
     price: String(formData.get("price") ?? ""),
     durationMinutes: String(formData.get("durationMinutes") ?? ""),
-    bufferBeforeMinutes: String(formData.get("bufferBeforeMinutes") ?? ""),
-    bufferAfterMinutes: String(formData.get("bufferAfterMinutes") ?? ""),
   })
 
   if (!parsed.success) {
@@ -225,8 +205,8 @@ export const updateAdminService = async (formData: FormData) => {
       imageUrl: resolveServiceImageUrl(parsed.data.imageUrl) ?? DEFAULT_SERVICE_IMAGE_URL,
       price,
       durationMinutes: parsed.data.durationMinutes,
-      bufferBeforeMinutes: parsed.data.bufferBeforeMinutes,
-      bufferAfterMinutes: parsed.data.bufferAfterMinutes,
+      bufferBeforeMinutes: 0,
+      bufferAfterMinutes: 0,
     },
   })
 

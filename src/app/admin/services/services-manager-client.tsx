@@ -16,8 +16,6 @@ export interface AdminServiceItem {
   imageUrl: string
   price: string
   durationMinutes: string
-  bufferBeforeMinutes: string
-  bufferAfterMinutes: string
   isActive: boolean
 }
 
@@ -31,8 +29,6 @@ interface ServiceFormState {
   description: string
   imageUrl: string
   durationMinutes: string
-  bufferBeforeMinutes: string
-  bufferAfterMinutes: string
 }
 
 type PendingAction =
@@ -47,11 +43,13 @@ const emptyServiceForm: ServiceFormState = {
   description: "",
   imageUrl: "",
   durationMinutes: "30",
-  bufferBeforeMinutes: "0",
-  bufferAfterMinutes: "0",
 }
 const durationOptions = ["10", "15", "20", "30", "45", "60", "75", "90", "120"]
-const bufferOptions = ["0", "5", "10", "15", "20", "30"]
+const fieldLabelClassName =
+  "text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500"
+const inputClassName = "h-11 border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
+const selectClassName =
+  "h-11 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
 
 const sortServices = (services: AdminServiceItem[]) => {
   return [...services].sort((left, right) => left.name.localeCompare(right.name))
@@ -69,8 +67,8 @@ const createServiceFormData = (service: ServiceFormState, serviceId?: string) =>
   formData.set("description", service.description)
   formData.set("imageUrl", service.imageUrl)
   formData.set("durationMinutes", service.durationMinutes)
-  formData.set("bufferBeforeMinutes", service.bufferBeforeMinutes)
-  formData.set("bufferAfterMinutes", service.bufferAfterMinutes)
+  formData.set("bufferBeforeMinutes", "0")
+  formData.set("bufferAfterMinutes", "0")
 
   return formData
 }
@@ -207,7 +205,7 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
       <section className="mt-5 rounded-3xl border border-zinc-800/65 bg-zinc-950/45 p-3.5 shadow-[0_16px_36px_rgba(0,0,0,0.24)] sm:mt-6 sm:p-5">
         <div className="rounded-2xl border border-zinc-800/70 bg-gradient-to-b from-zinc-900/80 to-zinc-950/75 p-4 shadow-[0_10px_22px_rgba(0,0,0,0.22)] sm:p-5">
           <h2 className="text-lg font-semibold text-zinc-100">Novo servico</h2>
-          <form className="mt-4 grid gap-3 md:grid-cols-2" onSubmit={handleCreateService}>
+          <form className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4" onSubmit={handleCreateService}>
             <Input
               name="name"
               placeholder="Nome"
@@ -215,21 +213,22 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
               value={newService.name}
               disabled={pendingCreate}
               onChange={(event) => setNewService((service) => ({ ...service, name: event.target.value }))}
-              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
+              className={cn("col-span-2 sm:col-span-4", inputClassName)}
             />
-            <Input
-              name="price"
-              placeholder="Preco (ex: 59.90)"
-              required
-              value={newService.price}
-              disabled={pendingCreate}
-              onChange={(event) => setNewService((service) => ({ ...service, price: event.target.value }))}
-              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
-            />
-            <label className="space-y-1.5">
-              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                Duracao
-              </span>
+            <label className="space-y-1.5 sm:col-span-2">
+              <span className={fieldLabelClassName}>Preco</span>
+              <Input
+                name="price"
+                placeholder="59.90"
+                required
+                value={newService.price}
+                disabled={pendingCreate}
+                onChange={(event) => setNewService((service) => ({ ...service, price: event.target.value }))}
+                className={inputClassName}
+              />
+            </label>
+            <label className="space-y-1.5 sm:col-span-2">
+              <span className={fieldLabelClassName}>Duracao</span>
               <select
                 name="durationMinutes"
                 value={newService.durationMinutes}
@@ -237,7 +236,7 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                 onChange={(event) =>
                   setNewService((service) => ({ ...service, durationMinutes: event.target.value }))
                 }
-                className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+                className={selectClassName}
               >
                 {durationOptions.map((duration) => (
                   <option key={duration} value={duration}>
@@ -246,71 +245,37 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                 ))}
               </select>
             </label>
-            <label className="space-y-1.5">
-              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                Buffer antes
-              </span>
-              <select
-                name="bufferBeforeMinutes"
-                value={newService.bufferBeforeMinutes}
+            <label className="col-span-2 space-y-1.5 sm:col-span-4">
+              <span className={fieldLabelClassName}>Descricao</span>
+              <Input
+                name="description"
+                placeholder="Descricao opcional"
+                value={newService.description}
                 disabled={pendingCreate}
                 onChange={(event) =>
-                  setNewService((service) => ({ ...service, bufferBeforeMinutes: event.target.value }))
+                  setNewService((service) => ({ ...service, description: event.target.value }))
                 }
-                className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
-              >
-                {bufferOptions.map((buffer) => (
-                  <option key={buffer} value={buffer}>
-                    {buffer} min
-                  </option>
-                ))}
-              </select>
+                className={inputClassName}
+              />
             </label>
-            <label className="space-y-1.5">
-              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                Buffer depois
-              </span>
-              <select
-                name="bufferAfterMinutes"
-                value={newService.bufferAfterMinutes}
+            <label className="col-span-2 space-y-1.5 sm:col-span-4">
+              <span className={fieldLabelClassName}>Imagem</span>
+              <Input
+                name="imageUrl"
+                placeholder="corte.png ou /services/corte.png"
+                value={newService.imageUrl}
                 disabled={pendingCreate}
-                onChange={(event) =>
-                  setNewService((service) => ({ ...service, bufferAfterMinutes: event.target.value }))
-                }
-                className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
-              >
-                {bufferOptions.map((buffer) => (
-                  <option key={buffer} value={buffer}>
-                    {buffer} min
-                  </option>
-                ))}
-              </select>
+                onChange={(event) => setNewService((service) => ({ ...service, imageUrl: event.target.value }))}
+                className={inputClassName}
+              />
             </label>
-            <Input
-              name="description"
-              placeholder="Descricao (opcional)"
-              value={newService.description}
-              disabled={pendingCreate}
-              onChange={(event) =>
-                setNewService((service) => ({ ...service, description: event.target.value }))
-              }
-              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
-            />
-            <Input
-              name="imageUrl"
-              placeholder="Imagem: corte.png ou /services/corte.png (opcional)"
-              value={newService.imageUrl}
-              disabled={pendingCreate}
-              onChange={(event) => setNewService((service) => ({ ...service, imageUrl: event.target.value }))}
-              className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
-            />
-            <p className="text-xs text-zinc-500 md:col-span-2">
+            <p className="col-span-2 text-xs leading-relaxed text-zinc-500 sm:col-span-4">
               Dica: coloque a imagem em `public/services` e informe apenas o nome do arquivo.
             </p>
             <Button
               type="submit"
               disabled={pendingCreate}
-              className="md:col-span-2 md:w-fit rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25"
+              className="col-span-2 h-11 w-full rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25 sm:col-span-4 sm:w-fit"
             >
               {pendingCreate ? (
                 <>
@@ -365,27 +330,29 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                   </span>
                 </div>
 
-                <div className="grid gap-3 md:grid-cols-2">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Input
                     name="name"
+                    placeholder="Nome"
                     value={service.name}
                     required
                     disabled={cardIsPending}
                     onChange={(event) => updateServiceField(service.id, "name", event.target.value)}
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
+                    className={cn("col-span-2 sm:col-span-4", inputClassName)}
                   />
-                  <Input
-                    name="price"
-                    value={service.price}
-                    required
-                    disabled={cardIsPending}
-                    onChange={(event) => updateServiceField(service.id, "price", event.target.value)}
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
-                  />
-                  <label className="space-y-1.5">
-                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                      Duracao
-                    </span>
+                  <label className="space-y-1.5 sm:col-span-2">
+                    <span className={fieldLabelClassName}>Preco</span>
+                    <Input
+                      name="price"
+                      value={service.price}
+                      required
+                      disabled={cardIsPending}
+                      onChange={(event) => updateServiceField(service.id, "price", event.target.value)}
+                      className={inputClassName}
+                    />
+                  </label>
+                  <label className="space-y-1.5 sm:col-span-2">
+                    <span className={fieldLabelClassName}>Duracao</span>
                     <select
                       name="durationMinutes"
                       value={service.durationMinutes}
@@ -393,7 +360,7 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                       onChange={(event) =>
                         updateServiceField(service.id, "durationMinutes", event.target.value)
                       }
-                      className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
+                      className={selectClassName}
                     >
                       {durationOptions.map((duration) => (
                         <option key={duration} value={duration}>
@@ -402,70 +369,37 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                       ))}
                     </select>
                   </label>
-                  <label className="space-y-1.5">
-                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                      Buffer antes
-                    </span>
-                    <select
-                      name="bufferBeforeMinutes"
-                      value={service.bufferBeforeMinutes}
+                  <label className="col-span-2 space-y-1.5 sm:col-span-4">
+                    <span className={fieldLabelClassName}>Descricao</span>
+                    <Input
+                      name="description"
+                      value={service.description}
+                      placeholder="Descricao opcional"
                       disabled={cardIsPending}
                       onChange={(event) =>
-                        updateServiceField(service.id, "bufferBeforeMinutes", event.target.value)
+                        updateServiceField(service.id, "description", event.target.value)
                       }
-                      className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
-                    >
-                      {bufferOptions.map((buffer) => (
-                        <option key={buffer} value={buffer}>
-                          {buffer} min
-                        </option>
-                      ))}
-                    </select>
+                      className={inputClassName}
+                    />
                   </label>
-                  <label className="space-y-1.5 md:col-span-2">
-                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                      Buffer depois
-                    </span>
-                    <select
-                      name="bufferAfterMinutes"
-                      value={service.bufferAfterMinutes}
+                  <label className="col-span-2 space-y-1.5 sm:col-span-4">
+                    <span className={fieldLabelClassName}>Imagem</span>
+                    <Input
+                      name="imageUrl"
+                      value={service.imageUrl}
+                      placeholder="corte.png ou /services/corte.png"
                       disabled={cardIsPending}
-                      onChange={(event) =>
-                        updateServiceField(service.id, "bufferAfterMinutes", event.target.value)
-                      }
-                      className="h-10 w-full rounded-md border border-zinc-700/80 bg-zinc-900/85 px-3 text-sm text-zinc-100 outline-none transition-colors focus:border-brand/50"
-                    >
-                      {bufferOptions.map((buffer) => (
-                        <option key={buffer} value={buffer}>
-                          {buffer} min
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(event) => updateServiceField(service.id, "imageUrl", event.target.value)}
+                      className={inputClassName}
+                    />
                   </label>
-                  <Input
-                    name="description"
-                    value={service.description}
-                    disabled={cardIsPending}
-                    onChange={(event) =>
-                      updateServiceField(service.id, "description", event.target.value)
-                    }
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
-                  />
-                  <Input
-                    name="imageUrl"
-                    value={service.imageUrl}
-                    placeholder="Imagem: corte.png ou /services/corte.png"
-                    disabled={cardIsPending}
-                    onChange={(event) => updateServiceField(service.id, "imageUrl", event.target.value)}
-                    className="border-zinc-700/80 bg-zinc-900/85 text-zinc-100 md:col-span-2"
-                  />
                 </div>
 
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
                   <Button
                     type="submit"
                     disabled={cardIsPending}
-                    className="rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25"
+                    className="h-11 w-full rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25 sm:w-auto"
                   >
                     {isUpdating ? (
                       <>
@@ -483,7 +417,7 @@ const ServicesManagerClient = ({ initialServices }: ServicesManagerClientProps) 
                     type="button"
                     disabled={cardIsPending || !service.isActive}
                     onClick={() => void handleDeleteService(service)}
-                    className="inline-flex h-10 items-center justify-center rounded-xl border border-red-500/35 bg-red-500/12 px-4 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/20 disabled:pointer-events-none disabled:opacity-50"
+                    className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-red-500/35 bg-red-500/12 px-3 text-sm font-semibold text-red-200 transition-colors hover:bg-red-500/20 disabled:pointer-events-none disabled:opacity-50 sm:w-auto sm:px-4"
                   >
                     {isDeleting ? (
                       <>

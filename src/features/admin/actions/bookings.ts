@@ -36,9 +36,26 @@ type EditableBookingSchedule = {
   id: string
   startsAt: Date
   status: "SCHEDULED" | "DONE" | "CANCELED"
+  serviceId?: string
   serviceDurationMinutes: number
   serviceBufferBeforeMinutes: number
   serviceBufferAfterMinutes: number
+}
+
+interface GetAdminBookingEditDayContextParams {
+  bookingId: string
+  barberId: string
+  serviceId: string
+  date: Date
+}
+
+interface UpdateAdminBookingWizardParams {
+  bookingId: string
+  barberId: string
+  serviceId: string
+  startsAt: Date
+  customerName: string
+  customerPhone: string
 }
 
 const revalidateAdminBookingPaths = (bookingId: string) => {
@@ -98,6 +115,17 @@ const buildStartsAtWithDate = (startsAt: Date, dateInput: string) => {
   )
 }
 
+const userCanAccessBooking = ({
+  adminId,
+  bookingId,
+}: {
+  adminId: string
+  bookingId: string
+}) => ({
+  id: bookingId,
+  barberId: adminId,
+})
+
 const updateBookingScheduleForAdmin = async ({
   booking,
   adminId,
@@ -106,6 +134,8 @@ const updateBookingScheduleForAdmin = async ({
   booking: EditableBookingSchedule
   adminId: string
   data: {
+    customerName?: string
+    customerPhone?: string
     startsAt?: Date
     serviceId?: string
     serviceName?: string
@@ -360,6 +390,206 @@ export const deleteAdminBookingInline = async (bookingId: string) => {
 
   revalidateAdminBookingPaths(parsedBookingId.data)
   return { ok: true as const }
+}
+
+export const getAdminBookingEditDayContext = async ({
+  bookingId,
+  barberId,
+  serviceId,
+  date,
+}: GetAdminBookingEditDayContextParams) => {
+  const admin = await requireAdmin()
+  if (!canManageBookings(admin.role)) {
+    throw new Error("Not authorized to manage bookings")
+  }
+
+  const parsed = z
+    .object({
+      bookingId: idSchema,
+      barberId: idSchema,
+      serviceId: idSchema,
+      date: z.date(),
+    })
+    .safeParse({
+      bookingId,
+      barberId,
+      serviceId,
+      date,
+    })
+
+  if (!parsed.success || parsed.data.barberId !== admin.id) {
+    return {
+      availableTimes: [],
+    }
+  }
+
+  const [booking, service] = await Promise.all([
+    db.booking.findFirst({
+      where: userCanAccessBooking({
+        adminId: admin.id,
+        bookingId: parsed.data.bookingId,
+      }),
+      select: {
+        id: true,
+      },
+    }),
+    db.service.findUnique({
+      where: {
+        id: parsed.data.serviceId,
+      },
+      select: {
+        id: true,
+        durationMinutes: true,
+        bufferBeforeMinutes: true,
+        bufferAfterMinutes: true,
+      },
+    }),
+  ])
+
+  if (!booking || !service) {
+    return {
+      availableTimes: [],
+    }
+  }
+
+  const availableTimes = await getBarberAvailableTimesForDate({
+    barberId: parsed.data.barberId,
+    date: parsed.data.date,
+    serviceSchedule: {
+      durationMinutes: service.durationMinutes,
+      bufferBeforeMinutes: service.bufferBeforeMinutes,
+      bufferAfterMinutes: service.bufferAfterMinutes,
+    },
+    excludeBookingId: parsed.data.bookingId,
+    includeInactiveService: true,
+  })
+
+  return {
+    availableTimes,
+  }
+}
+
+export const updateAdminBookingWizard = async ({
+  bookingId,
+  barberId,
+  serviceId,
+  startsAt,
+  customerName,
+  customerPhone,
+}: UpdateAdminBookingWizardParams) => {
+  const admin = await requireAdmin()
+  if (!canManageBookings(admin.role)) {
+    throw new Error("Not authorized to manage bookings")
+  }
+
+  const parsed = z
+    .object({
+      bookingId: idSchema,
+      barberId: idSchema,
+      serviceId: idSchema,
+      startsAt: z.date(),
+      customerName: customerNameSchema,
+      customerPhone: phoneSchema,
+    })
+    .safeParse({
+      bookingId,
+      barberId,
+      serviceId,
+      startsAt,
+      customerName,
+      customerPhone,
+    })
+
+  if (!parsed.success || parsed.data.barberId !== admin.id) {
+    return {
+      ok: false as const,
+      message: "Dados de agendamento invalidos.",
+    }
+  }
+
+  const [booking, service] = await Promise.all([
+    db.booking.findFirst({
+      where: userCanAccessBooking({
+        adminId: admin.id,
+        bookingId: parsed.data.bookingId,
+      }),
+      select: {
+        id: true,
+        startsAt: true,
+        serviceId: true,
+        status: true,
+        serviceDurationMinutes: true,
+        serviceBufferBeforeMinutes: true,
+        serviceBufferAfterMinutes: true,
+      },
+    }),
+    db.service.findUnique({
+      where: {
+        id: parsed.data.serviceId,
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        durationMinutes: true,
+        bufferBeforeMinutes: true,
+        bufferAfterMinutes: true,
+      },
+    }),
+  ])
+
+  if (!booking || !service) {
+    return {
+      ok: false as const,
+      message: "Nao foi possivel localizar este agendamento.",
+    }
+  }
+
+  const scheduleChanged =
+    booking.serviceId !== service.id ||
+    booking.startsAt.getTime() !== parsed.data.startsAt.getTime()
+
+  const scheduleUpdated = scheduleChanged
+    ? await updateBookingScheduleForAdmin({
+        booking,
+        adminId: admin.id,
+        data: {
+          startsAt: parsed.data.startsAt,
+          customerName: parsed.data.customerName,
+          customerPhone: parsed.data.customerPhone,
+          serviceId: service.id,
+          serviceName: service.name,
+          servicePrice: service.price,
+          serviceDurationMinutes: service.durationMinutes,
+          serviceBufferBeforeMinutes: service.bufferBeforeMinutes,
+          serviceBufferAfterMinutes: service.bufferAfterMinutes,
+        },
+      })
+    : (
+        await db.booking.updateMany({
+          where: userCanAccessBooking({
+            adminId: admin.id,
+            bookingId: parsed.data.bookingId,
+          }),
+          data: {
+            customerName: parsed.data.customerName,
+            customerPhone: parsed.data.customerPhone,
+          },
+        })
+      ).count === 1
+
+  if (!scheduleUpdated) {
+    return {
+      ok: false as const,
+      message: "Este horario esta indisponivel. Escolha outro.",
+    }
+  }
+
+  revalidateAdminBookingPaths(parsed.data.bookingId)
+
+  return {
+    ok: true as const,
+  }
 }
 
 export const updateAdminBookingField = async (formData: FormData) => {

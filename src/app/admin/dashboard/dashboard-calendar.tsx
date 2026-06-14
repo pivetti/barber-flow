@@ -177,7 +177,7 @@ const BookingCard = ({
           </div>
 
           <Link
-            href={`/admin/bookings/${booking.id}`}
+            href={`/admin/bookings/${booking.id}/edit`}
             className="inline-flex h-8 shrink-0 items-center justify-center gap-1 rounded-xl border border-brand/35 bg-brand/12 px-2.5 text-[11px] font-semibold text-brand-100 transition-colors hover:bg-brand/25"
           >
             <Pencil className="h-3 w-3 shrink-0" />
@@ -465,9 +465,9 @@ const AdminDashboardCalendar = ({
           classNames={{
             caption_label: "text-sm font-semibold capitalize text-zinc-100",
             head_cell: "w-9 rounded-md text-[0.75rem] font-medium text-zinc-500",
-            day: "h-9 w-9 rounded-xl p-0 text-sm font-medium text-zinc-200 hover:bg-brand/15 hover:text-brand-100",
+            day: "h-9 w-9 rounded-full p-0 text-sm font-medium text-zinc-200 focus:outline-none focus-visible:rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-100/40 focus-visible:ring-offset-0 hover:bg-brand/15 hover:text-brand-100",
             day_selected:
-              "bg-brand text-white hover:bg-brand-hover hover:text-white focus:bg-brand focus:text-white",
+              "rounded-full bg-brand text-white hover:bg-brand-hover hover:text-white focus:bg-brand focus:text-white",
             day_today: "border border-brand/40 bg-brand/10 text-brand-100",
             day_outside: "text-zinc-700 opacity-60",
             nav_button:

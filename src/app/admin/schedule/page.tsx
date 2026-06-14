@@ -3,7 +3,6 @@ import { ptBR } from "date-fns/locale"
 import AdminHeader from "@/features/admin/components/admin-header"
 import {
   addWorkingHour,
-  createBlockedTime,
   deleteBlockedTime,
   deleteWorkingHour,
   updateSlotInterval,
@@ -14,6 +13,7 @@ import { canManageSchedule } from "@/lib/admin-permissions"
 import { db } from "@/lib/prisma"
 import { requireAdmin } from "@/lib/require-admin"
 import { redirect } from "next/navigation"
+import BlockedTimeForm from "./blocked-time-form"
 
 const weekDays = [
   { value: 1, label: "Segunda-feira" },
@@ -85,49 +85,7 @@ const ScheduleAdminPage = async () => {
             <h2 className="text-lg font-semibold text-zinc-100">Bloqueios de horario</h2>
             <p className="mt-1 text-sm text-zinc-400">Crie bloqueios por data com hora inicial e final.</p>
 
-            <form action={createBlockedTime} className="mt-4 grid gap-3 md:grid-cols-2">
-              <label className="text-sm text-zinc-300">
-                Data
-                <Input
-                  type="date"
-                  name="date"
-                  required
-                  className="mt-1 block h-14 w-full appearance-none overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-white"
-                />
-              </label>
-              <label className="text-sm text-zinc-300">
-                Hora inicial
-                <Input
-                  type="time"
-                  name="startTime"
-                  required
-                  className="mt-1 block h-14 w-full appearance-none overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-white"
-                />
-              </label>
-              <label className="text-sm text-zinc-300">
-                Hora final
-                <Input
-                  type="time"
-                  name="endTime"
-                  required
-                  className="mt-1 block h-14 w-full appearance-none overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 px-4 text-white"
-                />
-              </label>
-              <label className="text-sm text-zinc-300 md:col-span-2">
-                Motivo (opcional)
-                <Input
-                  name="reason"
-                  placeholder="Ex: Almoco, compromisso externo"
-                  className="mt-1 border-zinc-700/80 bg-zinc-900/85 text-zinc-100"
-                />
-              </label>
-              <Button
-                type="submit"
-                className="md:col-span-2 md:w-fit rounded-xl border border-brand/35 bg-brand/15 text-brand-100 hover:bg-brand/25"
-              >
-                Adicionar bloqueio
-              </Button>
-            </form>
+            <BlockedTimeForm />
 
             <div className="mt-4 space-y-2">
               {blockedTimes.map((blockedTime) => (

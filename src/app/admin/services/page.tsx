@@ -24,8 +24,6 @@ const ServicesAdminPage = async () => {
     imageUrl: service.imageUrl,
     price: service.price.toString(),
     durationMinutes: String(service.durationMinutes),
-    bufferBeforeMinutes: String(service.bufferBeforeMinutes),
-    bufferAfterMinutes: String(service.bufferAfterMinutes),
     isActive: service.isActive,
   }))
 

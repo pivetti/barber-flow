@@ -29,12 +29,16 @@ const BookingsPage = async ({ searchParams }: BookingsPageProps) => {
   })
 
   return (
-    <>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.16),transparent_40%),linear-gradient(to_bottom,#09090b,#18181b_58%,#09090b)] text-zinc-50">
       <Header />
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+      <main className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
         <BookingTokenManager barbers={barbers} />
+
+        <footer className="mx-auto mt-4 w-full max-w-2xl text-center text-xs leading-relaxed text-zinc-600">
+          Use o link seguro do comprovante para consultar ou ajustar seu agendamento.
+        </footer>
       </main>
-    </>
+    </div>
   )
 }
 

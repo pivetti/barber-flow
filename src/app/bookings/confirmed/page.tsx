@@ -1,9 +1,11 @@
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { Check } from "lucide-react"
 import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import Header from "@/components/header"
 import ConfirmedBookingActions from "@/features/booking/components/confirmed-booking-actions"
+import { CustomerBookingSummaryGrid } from "@/features/booking/components/customer-booking-summary"
 import { toBrasiliaWallClock } from "@/lib/brasilia-time"
 import { getAppEnv } from "@/lib/env"
 import { getPublicBookingFromSession } from "@/lib/public-booking-session"
@@ -32,9 +34,14 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
     notFound()
   }
 
-  const formattedDate = format(toBrasiliaWallClock(booking.startsAt), "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })
+  const bookingStart = toBrasiliaWallClock(booking.startsAt)
+  const bookingEnd = toBrasiliaWallClock(booking.endsAt)
+  const formattedDate = format(bookingStart, "dd/MM/yyyy 'as' HH:mm", { locale: ptBR })
+  const summaryDate = format(bookingStart, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+  const summaryTime = `${format(bookingStart, "HH:mm")} ate ${format(bookingEnd, "HH:mm")}`
   const barberWhatsappPhone = normalizeWhatsappPhone(booking.barber?.phone ?? "")
-  const managementUrl = `${getAppEnv().NEXT_PUBLIC_APP_URL}/manage?token=${encodeURIComponent(booking.cancellationToken)}`
+  const managementPath = `/manage?token=${encodeURIComponent(booking.cancellationToken)}`
+  const managementUrl = `${getAppEnv().NEXT_PUBLIC_APP_URL}${managementPath}`
   const receiptMessage = [
     "*Comprovante de Agendamento*",
     "",
@@ -51,43 +58,73 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
     : "#"
 
   return (
-    <>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.16),transparent_40%),linear-gradient(to_bottom,#09090b,#18181b_58%,#09090b)] text-zinc-50">
       <Header />
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-        <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-5">
-          <h1 className="text-xl font-bold md:text-2xl">Agendamento confirmado</h1>
-          <p className="mt-2 text-sm text-zinc-300">
-            {booking.customerName}, seu horário foi reservado com sucesso.
-          </p>
-          <p className="mt-1 text-sm text-zinc-400">
-            {booking.serviceName} com {booking.barber?.name ?? "barbeiro"} em{" "}
-            {formattedDate}.
-          </p>
-        </section>
+      <main className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
+        <section className="mx-auto w-full max-w-2xl rounded-3xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.42)] sm:p-6">
+          <div className="flex flex-col items-center text-center">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/35 bg-emerald-500/15 text-emerald-200 shadow-[0_0_32px_rgba(16,185,129,0.16)]">
+              <Check className="h-7 w-7" />
+            </span>
+            <h1 className="mt-4 text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">
+              Agendamento confirmado
+            </h1>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-300">
+              {booking.customerName}, seu horario foi reservado com sucesso.
+            </p>
+          </div>
 
-        <section className="mt-5 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-5">
-          <p className="mb-4 text-xs font-bold uppercase text-zinc-400">
-            Sessão temporária
-          </p>
+          <div className="mt-6 rounded-2xl border border-zinc-800/70 bg-zinc-900/45 p-3">
+            <CustomerBookingSummaryGrid
+              items={[
+                {
+                  icon: "service",
+                  label: "Servico",
+                  value: booking.serviceName,
+                },
+                {
+                  icon: "barber",
+                  label: "Barbeiro",
+                  value: booking.barber?.name ?? "Barbeiro",
+                },
+                {
+                  icon: "date",
+                  label: "Data",
+                  value: summaryDate,
+                },
+                {
+                  icon: "time",
+                  label: "Horario",
+                  value: summaryTime,
+                },
+              ]}
+            />
+          </div>
 
-          <ConfirmedBookingActions
-            bookingId={booking.id}
-            canCancel={booking.status === "SCHEDULED"}
-            barberReceiptWhatsappUrl={barberReceiptWhatsappUrl}
-            canSendReceipt={Boolean(barberWhatsappPhone)}
-          />
+          <div className="mt-5">
+            <ConfirmedBookingActions
+              bookingId={booking.id}
+              canCancel={booking.status === "SCHEDULED"}
+              barberReceiptWhatsappUrl={barberReceiptWhatsappUrl}
+              canSendReceipt={Boolean(barberWhatsappPhone)}
+            />
+          </div>
 
-          <div className="mt-3">
+          <div className="mt-5 text-center">
             <Link
-              href="/bookings"
-              className="text-xs text-zinc-400 underline underline-offset-4 transition-colors hover:text-zinc-300"
+              href={managementPath}
+              className="text-xs font-medium text-zinc-500 underline underline-offset-4 transition-colors hover:text-zinc-300"
             >
-              Ou gerencie este agendamento na área de agendamentos.
+              Gerenciar este agendamento
             </Link>
           </div>
         </section>
+
+        <footer className="mx-auto mt-4 w-full max-w-2xl text-center text-xs leading-relaxed text-zinc-600">
+          Guarde o link de gerenciamento para consultar ou ajustar seu agendamento.
+        </footer>
       </main>
-    </>
+    </div>
   )
 }
 

@@ -40,9 +40,11 @@ const mapPublicBooking = (booking: NonNullable<Awaited<ReturnType<typeof getPubl
   customerName: booking.customerName,
   customerPhone: booking.customerPhone,
   startsAt: booking.startsAt,
+  endsAt: booking.endsAt,
   cancellationRequested: booking.cancellationRequested,
   serviceName: booking.serviceName,
   barberName: booking.barber?.name ?? null,
+  barberPhone: booking.barber?.phone ?? null,
 })
 
 const revalidateBookingPaths = () => {
