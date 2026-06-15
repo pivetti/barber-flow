@@ -18,6 +18,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 import { toast } from "sonner"
 import { createBooking } from "@/features/booking/actions/create-booking"
 import { getBookingDayContext } from "@/features/booking/actions/get-booking-day-context"
+import LgpdBookingNotice from "@/features/booking/components/lgpd-booking-notice"
 import {
   CUSTOMER_PROFILE_STORAGE_KEY,
   parseCustomerProfile,
@@ -462,13 +463,16 @@ const ServiceItem = ({ service, barber }: ServiceItemProps) => {
           </div>
 
           <SheetFooter>
-            <Button
-              className="h-10 rounded-xl"
-              onClick={handleCreateBooking}
-              disabled={!selectedDate || isCreatingBooking}
-            >
-              {isCreatingBooking ? "Confirmando..." : "Confirmar reserva"}
-            </Button>
+            <div className="w-full space-y-3">
+              <Button
+                className="h-10 w-full rounded-xl"
+                onClick={handleCreateBooking}
+                disabled={!selectedDate || isCreatingBooking}
+              >
+                {isCreatingBooking ? "Confirmando..." : "Confirmar reserva"}
+              </Button>
+              <LgpdBookingNotice />
+            </div>
           </SheetFooter>
         </SheetContent>
       </Sheet>

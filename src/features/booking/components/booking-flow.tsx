@@ -37,6 +37,7 @@ import {
   BookingStepShell,
   BookingSummaryRow as SummaryRow,
 } from "@/features/booking/components/booking-flow-ui"
+import LgpdBookingNotice from "@/features/booking/components/lgpd-booking-notice"
 import { createBooking } from "@/features/booking/actions/create-booking"
 import { getBookingDayContext } from "@/features/booking/actions/get-booking-day-context"
 import {
@@ -816,6 +817,8 @@ const BookingResumeCard = ({
           </>
         )}
       </Button>
+
+      <LgpdBookingNotice className={cn(compact ? "mt-2" : "mt-3")} />
 
       <p className={cn("text-center text-xs leading-relaxed text-zinc-500", compact ? "mt-2" : "mt-3")}>
         A reserva sera criada somente apos a confirmacao.

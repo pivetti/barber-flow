@@ -7,11 +7,13 @@ import BookingFlow from "@/features/booking/components/booking-flow"
 import { toBrasiliaWallClock } from "@/lib/brasilia-time"
 import { db } from "@/lib/prisma"
 import { getSafePublicImagePath } from "@/lib/safe-public-image"
+import { getOrCreateSiteSettings } from "@/lib/site-settings"
 
 export const dynamic = "force-dynamic"
 
 const Home = async () => {
-  const [barbers, services] = await Promise.all([
+  const [settings, barbers, services] = await Promise.all([
+    getOrCreateSiteSettings(),
     db.barber.findMany({
       where: {
         isActive: true,
@@ -46,6 +48,7 @@ const Home = async () => {
   ])
 
   const now = toBrasiliaWallClock(new Date())
+  const bannerUrl = getSafePublicImagePath(settings.bannerUrl, "/banner-jesi.png")
   const serializedBarbers = barbers.map((barber) => ({
     id: barber.id,
     name: barber.name,
@@ -85,7 +88,7 @@ const Home = async () => {
           <div className="relative h-52 w-full sm:h-64">
             <Image
               alt="Ambiente da barbearia"
-              src="/banner-jesi.png"
+              src={bannerUrl}
               fill
               priority
               sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1280px) calc(100vw - 3rem), 1280px"
@@ -96,11 +99,11 @@ const Home = async () => {
           <div className="p-4 sm:p-6">
             <div className="space-y-2">
               <h2 className="text-xl font-bold text-zinc-100 sm:text-2xl">
-                Barbearia do Jesi
+                {settings.businessName}
               </h2>
               <p className="flex items-start gap-2 text-sm text-zinc-300">
                 <MapPinIcon className="mt-0.5 h-4 w-4 text-brand-100" />
-                Rua Exemplo, 123 - Centro, Sao Paulo - SP
+                {settings.businessDescription}
               </p>
             </div>
           </div>

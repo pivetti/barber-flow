@@ -33,6 +33,9 @@
     --ring: 240 77% 40%;
 
     --radius: 0.5rem;
+
+    --brand-primary-rgb: 17 17 132;
+    --brand-secondary-rgb: 27 27 163;
   }
 }
 

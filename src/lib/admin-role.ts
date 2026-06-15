@@ -4,6 +4,8 @@ export const canManageBarbers = (role: AppBarberRole) => role === "OWNER" || rol
 
 export const canManageServices = (role: AppBarberRole) => role === "OWNER" || role === "ADMIN"
 
+export const canManageCustomization = (role: AppBarberRole) => role === "OWNER" || role === "ADMIN"
+
 export const canManageBookings = (role: AppBarberRole) =>
   role === "OWNER" || role === "ADMIN" || role === "BARBER"
 

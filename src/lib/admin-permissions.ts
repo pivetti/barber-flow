@@ -3,6 +3,7 @@ import {
   AppBarberRole,
   canManageBarbers,
   canManageBookings,
+  canManageCustomization,
   canManageSchedule,
   canManageServices,
   mustUseOwnDataScope,
@@ -11,6 +12,7 @@ import {
 export {
   canManageBarbers,
   canManageBookings,
+  canManageCustomization,
   canManageSchedule,
   canManageServices,
   mustUseOwnDataScope,

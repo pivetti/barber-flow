@@ -43,7 +43,6 @@ interface PublicBooking {
   id: string
   status: string
   customerName: string
-  customerPhone: string
   startsAt: Date
   endsAt: Date
   cancellationRequested: boolean
@@ -112,7 +111,7 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
   return (
     <section className="mx-auto w-full max-w-2xl rounded-3xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.42)] sm:p-6">
       <div className="flex flex-col items-center text-center">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-brand/35 bg-brand/15 text-brand-100 shadow-[0_0_32px_rgba(17,17,132,0.18)]">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-brand/35 bg-brand/15 text-brand-100 shadow-[0_0_32px_rgb(var(--brand-primary-rgb)_/_0.18)]">
           <CalendarCheck2 className="h-7 w-7" />
         </span>
         <h1 className="mt-4 text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">

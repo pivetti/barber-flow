@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { CalendarDays, Home, LogOut, MenuIcon, Scissors, Users, Wrench } from "lucide-react"
+import { CalendarDays, Home, LogOut, MenuIcon, Palette, Scissors, Users, Wrench } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 import AdminLogoutButton from "./admin-logout-button"
@@ -42,6 +42,7 @@ const AdminMobileMenu = ({ adminName, links }: AdminMobileMenuProps) => {
     if (href === "/admin/schedule") return CalendarDays
     if (href === "/admin/services") return Wrench
     if (href === "/admin/barbers") return Users
+    if (href === "/admin/personalizacao") return Palette
     return Scissors
   }
 

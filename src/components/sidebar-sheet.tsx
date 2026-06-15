@@ -11,7 +11,12 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "./ui/sheet"
 
-const SidebarSheet = () => {
+interface SidebarSheetProps {
+  businessName: string
+  logoUrl: string
+}
+
+const SidebarSheet = ({ businessName, logoUrl }: SidebarSheetProps) => {
   const pathname = usePathname()
 
   return (
@@ -19,15 +24,15 @@ const SidebarSheet = () => {
       <SheetHeader className="space-y-0 border-b border-zinc-800 bg-gradient-to-b from-zinc-900/95 to-zinc-950/90 p-5 pr-14">
         <div className="flex items-center gap-3">
           <Image
-            src="/logo-jesi.png"
-            alt="Barbearia do Jesi"
+            src={logoUrl}
+            alt={businessName}
             width={54}
             height={34}
             className="h-9 w-auto object-contain"
           />
           <div>
             <SheetTitle className="text-left text-base font-semibold text-zinc-100">
-              Barbearia do Jesi
+              {businessName}
             </SheetTitle>
             <SheetDescription className="sr-only">
               Menu de navegacao com links principais.

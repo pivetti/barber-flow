@@ -38,7 +38,6 @@ const mapPublicBooking = (booking: NonNullable<Awaited<ReturnType<typeof getPubl
   id: booking.id,
   status: booking.status,
   customerName: booking.customerName,
-  customerPhone: booking.customerPhone,
   startsAt: booking.startsAt,
   endsAt: booking.endsAt,
   cancellationRequested: booking.cancellationRequested,

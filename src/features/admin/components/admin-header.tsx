@@ -2,7 +2,12 @@
 
 import Image from "next/image"
 import AdminMobileMenu from "./admin-mobile-menu"
-import { AppBarberRole, canManageBarbers, canManageServices } from "@/lib/admin-role"
+import {
+  AppBarberRole,
+  canManageBarbers,
+  canManageCustomization,
+  canManageServices,
+} from "@/lib/admin-role"
 
 interface AdminHeaderProps {
   adminName: string
@@ -15,6 +20,9 @@ const AdminHeader = ({ adminName, adminRole }: AdminHeaderProps) => {
     { href: "/admin/schedule", label: "Horários" },
     ...(canManageServices(adminRole) ? [{ href: "/admin/services", label: "Serviços" }] : []),
     ...(canManageBarbers(adminRole) ? [{ href: "/admin/barbers", label: "Barbeiros" }] : []),
+    ...(canManageCustomization(adminRole)
+      ? [{ href: "/admin/personalizacao", label: "Personalização" }]
+      : []),
   ]
 
   return (
