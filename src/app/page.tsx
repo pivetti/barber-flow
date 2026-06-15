@@ -49,6 +49,7 @@ const Home = async () => {
 
   const now = toBrasiliaWallClock(new Date())
   const bannerUrl = getSafePublicImagePath(settings.bannerUrl, "/banner-jesi.png")
+  const businessLocation = settings.businessLocation.trim()
   const serializedBarbers = barbers.map((barber) => ({
     id: barber.id,
     name: barber.name,
@@ -101,8 +102,13 @@ const Home = async () => {
               <h2 className="text-xl font-bold text-zinc-100 sm:text-2xl">
                 {settings.businessName}
               </h2>
-              <p className="flex items-start gap-2 text-sm text-zinc-300">
-                <MapPinIcon className="mt-0.5 h-4 w-4 text-brand-100" />
+              {businessLocation && (
+                <p className="flex items-start gap-2 text-sm text-zinc-300">
+                  <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-100" />
+                  <span>{businessLocation}</span>
+                </p>
+              )}
+              <p className="text-sm leading-relaxed text-zinc-300">
                 {settings.businessDescription}
               </p>
             </div>

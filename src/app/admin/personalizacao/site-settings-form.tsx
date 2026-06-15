@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils"
 
 export interface SiteSettingsFormState {
   businessName: string
+  businessLocation: string
   businessDescription: string
   logoUrl: string
   bannerUrl: string
@@ -104,6 +105,7 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
 
       setSettings({
         businessName: result.settings.businessName,
+        businessLocation: result.settings.businessLocation,
         businessDescription: result.settings.businessDescription,
         logoUrl: result.settings.logoUrl,
         bannerUrl: result.settings.bannerUrl,
@@ -154,6 +156,18 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
                 onChange={(event) => updateField("businessName", event.target.value)}
                 disabled={isSaving}
                 required
+                className={inputClassName}
+              />
+            </label>
+
+            <label className="col-span-2 space-y-1.5 sm:col-span-4">
+              <span className={fieldLabelClassName}>Localizacao</span>
+              <Input
+                name="businessLocation"
+                value={settings.businessLocation}
+                onChange={(event) => updateField("businessLocation", event.target.value)}
+                placeholder="Rua, numero - bairro, cidade"
+                disabled={isSaving}
                 className={inputClassName}
               />
             </label>

@@ -201,6 +201,7 @@ model RateLimitAttempt {
 model SiteSettings {
   id                  String   @id @default("default")
   businessName        String   @default("Barbearia do Jesi")
+  businessLocation    String   @default("")
   businessDescription String   @default("Agendamentos online para uma experiencia simples, organizada e premium.")
   logoUrl             String   @default("/logo-jesi.png")
   bannerUrl           String   @default("/banner-jesi.png")

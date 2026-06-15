@@ -7,6 +7,7 @@ export const SITE_SETTINGS_ID = "default"
 export const defaultSiteSettings = {
   id: SITE_SETTINGS_ID,
   businessName: businessConfig.businessName,
+  businessLocation: businessConfig.businessLocation,
   businessDescription:
     "Agendamentos online para uma experiencia simples, organizada e premium.",
   logoUrl: "/logo-jesi.png",
@@ -53,6 +54,7 @@ export const getSiteSettingsStyle = (settings: Pick<PublicSiteSettings, "primary
 export const serializeSiteSettings = (settings: PublicSiteSettings): PublicSiteSettings => ({
   id: settings.id,
   businessName: settings.businessName,
+  businessLocation: settings.businessLocation,
   businessDescription: settings.businessDescription,
   logoUrl: settings.logoUrl,
   bannerUrl: settings.bannerUrl,

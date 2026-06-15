@@ -15,6 +15,7 @@ const PersonalizacaoAdminPage = async () => {
   const settings = await getOrCreateSiteSettings()
   const initialSettings: SiteSettingsFormState = {
     businessName: settings.businessName,
+    businessLocation: settings.businessLocation,
     businessDescription: settings.businessDescription,
     logoUrl: settings.logoUrl,
     bannerUrl: settings.bannerUrl,

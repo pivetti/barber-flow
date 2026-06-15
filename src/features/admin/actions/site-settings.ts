@@ -56,6 +56,7 @@ const imageUrlSchema = z
 
 const siteSettingsSchema = z.object({
   businessName: requiredTextSchema(2, 100),
+  businessLocation: optionalTextSchema(180),
   businessDescription: optionalTextSchema(700),
   logoUrl: imageUrlSchema,
   bannerUrl: imageUrlSchema,
@@ -90,6 +91,7 @@ export const updateSiteSettings = async (formData: FormData) => {
 
   const parsed = siteSettingsSchema.safeParse({
     businessName: String(formData.get("businessName") ?? ""),
+    businessLocation: String(formData.get("businessLocation") ?? ""),
     businessDescription: String(formData.get("businessDescription") ?? ""),
     logoUrl: String(formData.get("logoUrl") ?? ""),
     bannerUrl: String(formData.get("bannerUrl") ?? ""),
