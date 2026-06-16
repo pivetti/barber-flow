@@ -110,18 +110,10 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
             />
           </div>
 
-          <div className="mt-5 text-center">
-            <Link
-              href={managementPath}
-              className="text-xs font-medium text-zinc-500 underline underline-offset-4 transition-colors hover:text-zinc-300"
-            >
-              Gerenciar este agendamento
-            </Link>
-          </div>
         </section>
 
         <footer className="mx-auto mt-4 w-full max-w-2xl text-center text-xs leading-relaxed text-zinc-600">
-          Guarde o link de gerenciamento para consultar ou ajustar seu agendamento.
+          Guarde este comprovante para consultar os dados do seu agendamento.
           <br />
           <Link
             href="/politica-de-privacidade"

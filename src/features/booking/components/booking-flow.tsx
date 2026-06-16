@@ -1319,10 +1319,7 @@ const BookingFlow = ({
     >
       <div className="mb-4 flex flex-col gap-2">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-100/85">
-            Agendamento
-          </p>
-          <h1 className="mt-1 text-xl font-bold leading-tight text-zinc-50 sm:text-2xl">
+          <h1 className="text-xl font-bold leading-tight text-zinc-50 sm:text-2xl">
             Reserve seu horario
           </h1>
           <p className="mt-1 text-sm leading-relaxed text-zinc-400">

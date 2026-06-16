@@ -1,10 +1,8 @@
-import { format } from "date-fns"
-import { ptBR } from "date-fns/locale"
 import { MapPinIcon } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
+import HomeScheduleButton from "@/components/home-schedule-button"
 import BookingFlow from "@/features/booking/components/booking-flow"
-import { toBrasiliaWallClock } from "@/lib/brasilia-time"
 import { db } from "@/lib/prisma"
 import { getSafePublicImagePath } from "@/lib/safe-public-image"
 import { getOrCreateSiteSettings } from "@/lib/site-settings"
@@ -47,9 +45,9 @@ const Home = async () => {
     }),
   ])
 
-  const now = toBrasiliaWallClock(new Date())
   const bannerUrl = getSafePublicImagePath(settings.bannerUrl, "/banner-jesi.png")
   const businessLocation = settings.businessLocation.trim()
+  const businessDescription = settings.businessDescription.trim()
   const serializedBarbers = barbers.map((barber) => ({
     id: barber.id,
     name: barber.name,
@@ -67,67 +65,61 @@ const Home = async () => {
   }))
 
   return (
-    <div>
+    <div className="bg-zinc-950">
       <Header />
 
-      <main className="w-full scroll-smooth px-4 py-8 sm:px-6">
-        <section className="mx-auto w-full max-w-6xl space-y-1 xl:max-w-7xl">
-          <h2 className="text-xl font-bold md:text-2xl">Ola, seja bem-vindo!</h2>
+      <main className="w-full scroll-smooth bg-zinc-950">
+        <section className="mx-auto flex min-h-[calc(100svh-57px)] w-full max-w-3xl flex-col px-5 pb-12 pt-14 sm:px-6 md:min-h-[calc(100svh-61px)] md:pt-16">
+          <div className="mx-auto w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/45 shadow-2xl shadow-black/25">
+            <div className="relative aspect-[16/9] w-full bg-zinc-900">
+              <Image
+                alt="Ambiente da barbearia"
+                src={bannerUrl}
+                fill
+                priority
+                sizes="(max-width: 640px) calc(100vw - 2.5rem), 448px"
+                className="object-cover"
+              />
+            </div>
 
-          <p className="text-sm text-zinc-400">
-            <span className="capitalize">
-              {format(now, "EEEE, dd", { locale: ptBR })}
-            </span>
-            <span>&nbsp;de&nbsp;</span>
-            <span className="capitalize">
-              {format(now, "MMMM", { locale: ptBR })}
-            </span>
-          </p>
-        </section>
-
-        <section className="mx-auto mt-6 w-full max-w-6xl overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 xl:max-w-7xl">
-          <div className="relative h-52 w-full sm:h-64">
-            <Image
-              alt="Ambiente da barbearia"
-              src={bannerUrl}
-              fill
-              priority
-              sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1280px) calc(100vw - 3rem), 1280px"
-              className="object-cover"
-            />
-          </div>
-
-          <div className="p-4 sm:p-6">
-            <div className="space-y-2">
-              <h2 className="text-xl font-bold text-zinc-100 sm:text-2xl">
+            <div className="space-y-3 p-4">
+              <h2 className="text-xl font-bold leading-tight text-zinc-50">
                 {settings.businessName}
               </h2>
+
               {businessLocation && (
-                <p className="flex items-start gap-2 text-sm text-zinc-300">
-                  <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-100" />
+                <p className="flex items-center gap-2 text-sm font-medium text-zinc-300">
+                  <MapPinIcon className="h-4 w-4 shrink-0 text-brand-100" />
                   <span>{businessLocation}</span>
                 </p>
               )}
-              <p className="text-sm leading-relaxed text-zinc-300">
-                {settings.businessDescription}
-              </p>
+
+              {businessDescription && (
+                <p className="text-sm leading-relaxed text-zinc-300">
+                  {businessDescription}
+                </p>
+              )}
             </div>
           </div>
-        </section>
 
-        <div className="mx-auto mt-4 flex w-full max-w-6xl justify-center px-2 md:hidden xl:max-w-7xl">
-          <a
-            href="#agendamento"
-            className="inline-flex h-12 w-full max-w-sm items-center justify-center rounded-xl bg-brand px-6 text-sm font-semibold text-white shadow-md shadow-brand-950/30 transition-colors hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-100 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-          >
-            Agendar
-          </a>
-        </div>
+          <div className="mt-8 text-center">
+            <h1 className="text-2xl font-bold leading-tight text-white sm:text-3xl">
+              Reserve seu horario
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+              Complete uma etapa por vez e confirme no resumo.
+            </p>
+          </div>
+
+          <div className="mx-auto mt-8 w-full max-w-md">
+            <HomeScheduleButton />
+          </div>
+        </section>
 
         <BookingFlow
           id="agendamento"
           rootElement="section"
-          className="mt-8 px-0 py-0 sm:px-0 lg:py-0"
+          className="px-5 pt-0 sm:px-6 lg:pt-0"
           barbers={serializedBarbers}
           services={serializedServices}
         />

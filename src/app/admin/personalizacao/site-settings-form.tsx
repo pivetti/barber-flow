@@ -36,8 +36,6 @@ const fieldLabelClassName =
   "text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500"
 const inputClassName =
   "h-11 border-zinc-700/80 bg-zinc-950/70 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-brand/50 focus-visible:ring-offset-0"
-const textareaClassName =
-  "min-h-[108px] w-full rounded-md border border-zinc-700/80 bg-zinc-950/70 px-3 py-3 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus-visible:ring-2 focus-visible:ring-brand/50 disabled:cursor-not-allowed disabled:opacity-50"
 
 const getPreviewUrl = (value: string, fallback: string) => {
   const normalized = value.trim()
@@ -139,7 +137,7 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-100/70">
                 Identidade
               </p>
-              <h2 className="text-lg font-semibold text-zinc-100">Dados publicos da barbearia</h2>
+              <h2 className="text-lg font-semibold text-zinc-100">Dados essenciais da barbearia</h2>
             </div>
             <span className="hidden rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 sm:inline-flex">
               <Check className="mr-1.5 h-3.5 w-3.5" />
@@ -157,34 +155,6 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
                 disabled={isSaving}
                 required
                 className={inputClassName}
-              />
-            </label>
-
-            <label className="col-span-2 space-y-1.5 sm:col-span-4">
-              <span className={fieldLabelClassName}>Localizacao</span>
-              <Input
-                name="businessLocation"
-                value={settings.businessLocation}
-                onChange={(event) => updateField("businessLocation", event.target.value)}
-                placeholder="Rua, numero - bairro, cidade"
-                disabled={isSaving}
-                className={inputClassName}
-              />
-            </label>
-
-            <label className="col-span-2 space-y-1.5 sm:col-span-4">
-              <span className={fieldLabelClassName}>Descricao</span>
-              <textarea
-                name="businessDescription"
-                value={settings.businessDescription}
-                onChange={(event) =>
-                  setSettings((currentSettings) => ({
-                    ...currentSettings,
-                    businessDescription: event.target.value,
-                  }))
-                }
-                disabled={isSaving}
-                className={textareaClassName}
               />
             </label>
 

@@ -93,11 +93,11 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
   const bookingStart = booking ? new Date(booking.startsAt) : null
   const bookingEnd = booking ? new Date(booking.endsAt) : null
   const summaryDate = bookingStart
-    ? format(bookingStart, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+    ? format(bookingStart, "dd MMM yyyy", { locale: ptBR })
     : ""
   const summaryTime =
     bookingStart && bookingEnd
-      ? `${format(bookingStart, "HH:mm")} ate ${format(bookingEnd, "HH:mm")}`
+      ? `${format(bookingStart, "HH:mm")} - ${format(bookingEnd, "HH:mm")}`
       : ""
   const barberWhatsappPhone = normalizeWhatsappPhone(booking?.barberPhone)
   const barberWhatsappUrl = barberWhatsappPhone ? `https://wa.me/${barberWhatsappPhone}` : "#"
@@ -109,28 +109,28 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
     : ""
 
   return (
-    <section className="mx-auto w-full max-w-2xl rounded-3xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.42)] sm:p-6">
+    <section className="mx-auto w-full max-w-md rounded-2xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-4 shadow-[0_18px_46px_rgba(0,0,0,0.36)] sm:max-w-2xl sm:p-5">
       <div className="flex flex-col items-center text-center">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-brand/35 bg-brand/15 text-brand-100 shadow-[0_0_32px_rgb(var(--brand-primary-rgb)_/_0.18)]">
-          <CalendarCheck2 className="h-7 w-7" />
+        <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-brand/35 bg-brand/15 text-brand-100 shadow-[0_0_28px_rgb(var(--brand-primary-rgb)_/_0.16)]">
+          <CalendarCheck2 className="h-5 w-5" />
         </span>
-        <h1 className="mt-4 text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">
+        <h1 className="mt-3 text-xl font-semibold leading-tight text-zinc-50 md:text-2xl">
           Gerencie seu agendamento
         </h1>
-        <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-300">
+        <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-zinc-300 sm:text-sm">
           Veja os detalhes do seu horario e faca alteracoes se necessario.
         </p>
       </div>
 
       {!hasLoaded && (
-        <div className="mt-6 flex min-h-36 items-center justify-center rounded-2xl border border-zinc-800/70 bg-zinc-900/45 px-4 text-sm text-zinc-400">
+        <div className="mt-4 flex min-h-28 items-center justify-center rounded-2xl border border-zinc-800/70 bg-zinc-900/45 px-4 text-sm text-zinc-400">
           <Loader2 className="mr-2 h-4 w-4 animate-spin text-brand-100" />
           Carregando agendamento...
         </div>
       )}
 
       {hasLoaded && !booking && (
-        <div className="mt-6 rounded-2xl border border-zinc-800/70 bg-zinc-900/45 p-4">
+        <div className="mt-4 rounded-2xl border border-zinc-800/70 bg-zinc-900/45 p-3">
           <div className="flex items-start gap-3">
             <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950/70 text-brand-100">
               <Info className="h-4 w-4" />
@@ -148,7 +148,7 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
 
           <Link
             href="/agendar"
-            className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-brand/40 bg-brand/12 px-4 text-sm font-semibold text-brand-100 transition-colors hover:bg-brand/20"
+            className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-brand/40 bg-brand/12 px-4 text-sm font-semibold text-brand-100 transition-colors hover:bg-brand/20"
           >
             <Plus className="h-4 w-4" />
             Agendar outro horario
@@ -158,8 +158,9 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
 
       {hasLoaded && booking && (
         <>
-          <div className="mt-6 rounded-2xl border border-zinc-800/70 bg-zinc-900/45 p-3">
+          <div className="mt-4 rounded-2xl border border-zinc-800/70 bg-zinc-900/45 p-2.5">
             <CustomerBookingSummaryGrid
+              compact
               items={[
                 {
                   icon: "customer",
@@ -196,19 +197,19 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
           </div>
 
           {booking.cancellationRequested && booking.status === "SCHEDULED" && (
-            <p className="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-center text-xs text-amber-100/85">
+            <p className="mt-2 rounded-xl border border-amber-400/20 bg-amber-400/10 px-3 py-2 text-center text-xs text-amber-100/85">
               Solicitacao de cancelamento enviada ao barbeiro.
             </p>
           )}
 
-          <div className="mt-5 space-y-3">
+          <div className="mt-4 space-y-2">
             <Link
               href={barberWhatsappUrl}
               target="_blank"
               rel="noreferrer"
               aria-disabled={!barberWhatsappPhone}
               tabIndex={barberWhatsappPhone ? undefined : -1}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/35 bg-emerald-500/15 px-4 text-sm font-semibold text-emerald-100 transition-colors hover:bg-emerald-500/25 aria-disabled:pointer-events-none aria-disabled:opacity-50"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/35 bg-emerald-500/15 px-4 text-sm font-semibold text-emerald-100 transition-colors hover:bg-emerald-500/25 aria-disabled:pointer-events-none aria-disabled:opacity-50"
             >
               <MessageCircle className="h-4 w-4" />
               Falar com barbeiro
@@ -217,7 +218,7 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
             <div className="grid gap-2 sm:grid-cols-2">
               <Link
                 href="/agendar"
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-brand/40 bg-brand/12 px-4 text-sm font-semibold text-brand-100 transition-colors hover:bg-brand/20"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand/40 bg-brand/12 px-3 text-xs font-semibold text-brand-100 transition-colors hover:bg-brand/20 sm:text-sm"
               >
                 <Plus className="h-4 w-4" />
                 Agendar outro horario
@@ -228,7 +229,7 @@ const BookingTokenManager = ({ barbers }: BookingTokenManagerProps) => {
                   <Button
                     variant="outline"
                     disabled={isPending || booking.status !== "SCHEDULED"}
-                    className="h-11 rounded-xl border-red-500/35 bg-red-500/10 text-sm font-semibold text-red-200 hover:bg-red-500/15 hover:text-red-100"
+                    className="h-10 rounded-xl border-red-500/35 bg-red-500/10 text-xs font-semibold text-red-200 hover:bg-red-500/15 hover:text-red-100 sm:text-sm"
                   >
                     <XCircle className="mr-2 h-4 w-4" />
                     Cancelar agendamento

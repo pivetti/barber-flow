@@ -59,7 +59,10 @@
     overflow-x: hidden;
   }
 
-  #agendamento,
+  #agendamento {
+    scroll-margin-top: 1rem;
+  }
+
   [id^="booking-"] {
     scroll-margin-top: 6rem;
   }
