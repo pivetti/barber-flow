@@ -58,7 +58,7 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
     : "#"
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgb(var(--brand-primary-rgb)_/_0.16),transparent_40%),linear-gradient(to_bottom,#09090b,#18181b_58%,#09090b)] text-zinc-50">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgb(var(--brand-background-rgb)_/_0.16),transparent_40%),linear-gradient(to_bottom,#09090b,#18181b_58%,#09090b)] text-zinc-50">
       <Header />
       <main className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
         <section className="mx-auto w-full max-w-2xl rounded-3xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.42)] sm:p-6">

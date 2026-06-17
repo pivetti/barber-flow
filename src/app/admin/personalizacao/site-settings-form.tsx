@@ -18,6 +18,8 @@ export interface SiteSettingsFormState {
   bannerUrl: string
   primaryColor: string
   secondaryColor: string
+  accentColor: string
+  backgroundGradientColor: string
   businessEmail: string
   businessPhone: string
   whatsappPhone: string
@@ -30,12 +32,14 @@ interface SiteSettingsFormProps {
   initialSettings: SiteSettingsFormState
 }
 
-type TextInputKey = Exclude<keyof SiteSettingsFormState, "businessDescription">
+type TextInputKey = keyof SiteSettingsFormState
 
 const fieldLabelClassName =
   "text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500"
 const inputClassName =
   "h-11 border-zinc-700/80 bg-zinc-950/70 text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-brand/50 focus-visible:ring-offset-0"
+const textareaClassName =
+  "min-h-28 resize-y rounded-md border border-zinc-700/80 bg-zinc-950/70 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
 
 const getPreviewUrl = (value: string, fallback: string) => {
   const normalized = value.trim()
@@ -53,6 +57,8 @@ const getColorInputValue = (value: string, fallback: string) => {
 
 const DEFAULT_PRIMARY_COLOR = "#111184"
 const DEFAULT_SECONDARY_COLOR = "#1B1BA3"
+const DEFAULT_ACCENT_COLOR = "#C7CBFF"
+const DEFAULT_BACKGROUND_GRADIENT_COLOR = "#111184"
 
 const createSettingsFormData = (settings: SiteSettingsFormState) => {
   const formData = new FormData()
@@ -75,6 +81,11 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
   const secondaryColorInputValue = getColorInputValue(
     settings.secondaryColor,
     DEFAULT_SECONDARY_COLOR,
+  )
+  const accentColorInputValue = getColorInputValue(settings.accentColor, DEFAULT_ACCENT_COLOR)
+  const backgroundGradientColorInputValue = getColorInputValue(
+    settings.backgroundGradientColor,
+    DEFAULT_BACKGROUND_GRADIENT_COLOR,
   )
 
   const updateField = (field: TextInputKey, value: string) => {
@@ -109,6 +120,8 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
         bannerUrl: result.settings.bannerUrl,
         primaryColor: result.settings.primaryColor,
         secondaryColor: result.settings.secondaryColor,
+        accentColor: result.settings.accentColor,
+        backgroundGradientColor: result.settings.backgroundGradientColor,
         businessEmail: result.settings.businessEmail,
         businessPhone: result.settings.businessPhone,
         whatsappPhone: result.settings.whatsappPhone,
@@ -128,7 +141,7 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
   return (
     <form
       onSubmit={(event) => void handleSubmit(event)}
-      className="mt-5 rounded-3xl border border-zinc-800/65 bg-[radial-gradient(circle_at_top_right,rgb(var(--brand-primary-rgb)_/_0.14),transparent_38%),linear-gradient(to_bottom,rgba(24,24,27,0.92),rgba(9,9,11,0.9))] p-4 shadow-[0_18px_42px_rgba(0,0,0,0.3)] sm:mt-6 sm:p-6"
+      className="mt-5 rounded-3xl border border-zinc-800/65 bg-[radial-gradient(circle_at_top_right,rgb(var(--brand-background-rgb)_/_0.14),transparent_38%),linear-gradient(to_bottom,rgba(24,24,27,0.92),rgba(9,9,11,0.9))] p-4 shadow-[0_18px_42px_rgba(0,0,0,0.3)] sm:mt-6 sm:p-6"
     >
       <div className="grid gap-6">
         <section className="space-y-4">
@@ -155,6 +168,31 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
                 disabled={isSaving}
                 required
                 className={inputClassName}
+              />
+            </label>
+
+            <label className="col-span-2 space-y-1.5 sm:col-span-4">
+              <span className={fieldLabelClassName}>Endereco</span>
+              <Input
+                name="businessLocation"
+                value={settings.businessLocation}
+                onChange={(event) => updateField("businessLocation", event.target.value)}
+                placeholder="Rua, numero, bairro e cidade"
+                disabled={isSaving}
+                className={inputClassName}
+              />
+            </label>
+
+            <label className="col-span-2 space-y-1.5 sm:col-span-4">
+              <span className={fieldLabelClassName}>Descricao</span>
+              <textarea
+                name="businessDescription"
+                value={settings.businessDescription}
+                onChange={(event) => updateField("businessDescription", event.target.value)}
+                placeholder="Resumo exibido nas paginas publicas"
+                disabled={isSaving}
+                maxLength={700}
+                className={textareaClassName}
               />
             </label>
 
@@ -214,10 +252,10 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-100/70">
               Cores
             </p>
-            <h2 className="text-lg font-semibold text-zinc-100">Marca e botoes principais</h2>
+            <h2 className="text-lg font-semibold text-zinc-100">Marca, destaques e fundos</h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <label className="space-y-1.5">
               <span className={fieldLabelClassName}>Cor principal</span>
               <div className="flex h-11 items-center gap-2 rounded-md border border-zinc-700/80 bg-zinc-950/70 px-2">
@@ -257,16 +295,60 @@ const SiteSettingsForm = ({ initialSettings }: SiteSettingsFormProps) => {
                 />
               </div>
             </label>
+
+            <label className="space-y-1.5">
+              <span className={fieldLabelClassName}>Texto de destaque</span>
+              <div className="flex h-11 items-center gap-2 rounded-md border border-zinc-700/80 bg-zinc-950/70 px-2">
+                <input
+                  type="color"
+                  name="accentColor"
+                  value={accentColorInputValue}
+                  onChange={(event) => updateField("accentColor", event.target.value.toUpperCase())}
+                  disabled={isSaving}
+                  className="h-8 w-10 cursor-pointer rounded-lg border border-zinc-700 bg-transparent p-0"
+                />
+                <Input
+                  value={settings.accentColor}
+                  onChange={(event) => updateField("accentColor", event.target.value)}
+                  disabled={isSaving}
+                  className="h-8 border-0 bg-transparent px-0 text-xs uppercase focus-visible:ring-0"
+                />
+              </div>
+            </label>
+
+            <label className="space-y-1.5">
+              <span className={fieldLabelClassName}>Gradiente de fundo</span>
+              <div className="flex h-11 items-center gap-2 rounded-md border border-zinc-700/80 bg-zinc-950/70 px-2">
+                <input
+                  type="color"
+                  name="backgroundGradientColor"
+                  value={backgroundGradientColorInputValue}
+                  onChange={(event) =>
+                    updateField("backgroundGradientColor", event.target.value.toUpperCase())
+                  }
+                  disabled={isSaving}
+                  className="h-8 w-10 cursor-pointer rounded-lg border border-zinc-700 bg-transparent p-0"
+                />
+                <Input
+                  value={settings.backgroundGradientColor}
+                  onChange={(event) => updateField("backgroundGradientColor", event.target.value)}
+                  disabled={isSaving}
+                  className="h-8 border-0 bg-transparent px-0 text-xs uppercase focus-visible:ring-0"
+                />
+              </div>
+            </label>
           </div>
 
           <div
             className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-800/70 bg-zinc-950/55 p-3"
             style={{
-              background: `linear-gradient(135deg, ${primaryColorInputValue}2E, ${secondaryColorInputValue}14)`,
+              background: `radial-gradient(circle at top left, ${backgroundGradientColorInputValue}40, transparent 48%), linear-gradient(135deg, ${primaryColorInputValue}2E, ${secondaryColorInputValue}14)`,
             }}
           >
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-zinc-100">Preview da acao principal</p>
+              <p className="text-sm font-semibold" style={{ color: accentColorInputValue }}>
+                Preview do texto de destaque
+              </p>
               <p className="text-xs text-zinc-500">As cores sao aplicadas por CSS variables.</p>
             </div>
             <span

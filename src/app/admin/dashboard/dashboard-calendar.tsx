@@ -424,7 +424,7 @@ const AdminDashboardCalendar = ({
 
   return (
     <div className="mt-5 grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)] lg:items-start">
-      <aside className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.10),transparent_44%),linear-gradient(to_bottom,rgba(24,24,27,0.94),rgba(9,9,11,0.90))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.26)] sm:p-5 lg:sticky lg:top-24">
+      <aside className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgb(var(--brand-background-rgb)_/_0.10),transparent_44%),linear-gradient(to_bottom,rgba(24,24,27,0.94),rgba(9,9,11,0.90))] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.26)] sm:p-5 lg:sticky lg:top-24">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-100/75">

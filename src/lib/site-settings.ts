@@ -14,6 +14,8 @@ export const defaultSiteSettings = {
   bannerUrl: "/banner-jesi.png",
   primaryColor: "#111184",
   secondaryColor: "#1b1ba3",
+  accentColor: "#c7cbff",
+  backgroundGradientColor: "#111184",
   businessEmail: businessConfig.businessEmail,
   businessPhone: businessConfig.businessPhone,
   whatsappPhone: "",
@@ -46,9 +48,16 @@ export const hexToRgbParts = (value: string) => {
   return `${red} ${green} ${blue}`
 }
 
-export const getSiteSettingsStyle = (settings: Pick<PublicSiteSettings, "primaryColor" | "secondaryColor">) => ({
+export const getSiteSettingsStyle = (
+  settings: Pick<
+    PublicSiteSettings,
+    "primaryColor" | "secondaryColor" | "accentColor" | "backgroundGradientColor"
+  >,
+) => ({
   "--brand-primary-rgb": hexToRgbParts(settings.primaryColor),
   "--brand-secondary-rgb": hexToRgbParts(settings.secondaryColor),
+  "--brand-accent-rgb": hexToRgbParts(settings.accentColor),
+  "--brand-background-rgb": hexToRgbParts(settings.backgroundGradientColor),
 })
 
 export const serializeSiteSettings = (settings: PublicSiteSettings): PublicSiteSettings => ({
@@ -60,6 +69,8 @@ export const serializeSiteSettings = (settings: PublicSiteSettings): PublicSiteS
   bannerUrl: settings.bannerUrl,
   primaryColor: settings.primaryColor,
   secondaryColor: settings.secondaryColor,
+  accentColor: settings.accentColor,
+  backgroundGradientColor: settings.backgroundGradientColor,
   businessEmail: settings.businessEmail,
   businessPhone: settings.businessPhone,
   whatsappPhone: settings.whatsappPhone,

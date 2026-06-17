@@ -98,7 +98,7 @@ const AdminLoginForm = ({ nextPath }: AdminLoginFormProps) => {
 
       <Button
         type="submit"
-        className="h-12 w-full rounded-xl border border-brand/45 bg-brand text-sm font-semibold text-white shadow-[0_14px_28px_rgba(17,17,132,0.28)] hover:bg-brand-hover"
+        className="h-12 w-full rounded-xl border border-brand/45 bg-brand text-sm font-semibold text-white shadow-[0_14px_28px_rgb(var(--brand-primary-rgb)_/_0.28)] hover:bg-brand-hover"
         disabled={isSubmitting}
       >
         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

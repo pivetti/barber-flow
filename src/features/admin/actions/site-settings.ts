@@ -27,11 +27,12 @@ const emailSchema = z
 const phoneSchema = z.string().transform(sanitizeText).pipe(z.string().min(8).max(40))
 const optionalPhoneSchema = z.string().transform(sanitizeText).pipe(z.string().max(40))
 
-const hexColorSchema = z
-  .string()
-  .transform(sanitizeText)
-  .refine((value) => /^#[0-9A-Fa-f]{6}$/.test(value), "Invalid HEX color")
-  .transform((value) => normalizeHexColor(value, defaultSiteSettings.primaryColor))
+const hexColorSchema = (fallback: string) =>
+  z
+    .string()
+    .transform(sanitizeText)
+    .refine((value) => /^#[0-9A-Fa-f]{6}$/.test(value), "Invalid HEX color")
+    .transform((value) => normalizeHexColor(value, fallback))
 
 const imageUrlSchema = z
   .string()
@@ -60,8 +61,10 @@ const siteSettingsSchema = z.object({
   businessDescription: optionalTextSchema(700),
   logoUrl: imageUrlSchema,
   bannerUrl: imageUrlSchema,
-  primaryColor: hexColorSchema,
-  secondaryColor: hexColorSchema,
+  primaryColor: hexColorSchema(defaultSiteSettings.primaryColor),
+  secondaryColor: hexColorSchema(defaultSiteSettings.secondaryColor),
+  accentColor: hexColorSchema(defaultSiteSettings.accentColor),
+  backgroundGradientColor: hexColorSchema(defaultSiteSettings.backgroundGradientColor),
   businessEmail: emailSchema,
   businessPhone: phoneSchema,
   whatsappPhone: optionalPhoneSchema,
@@ -97,6 +100,8 @@ export const updateSiteSettings = async (formData: FormData) => {
     bannerUrl: String(formData.get("bannerUrl") ?? ""),
     primaryColor: String(formData.get("primaryColor") ?? ""),
     secondaryColor: String(formData.get("secondaryColor") ?? ""),
+    accentColor: String(formData.get("accentColor") ?? ""),
+    backgroundGradientColor: String(formData.get("backgroundGradientColor") ?? ""),
     businessEmail: String(formData.get("businessEmail") ?? ""),
     businessPhone: String(formData.get("businessPhone") ?? ""),
     whatsappPhone: String(formData.get("whatsappPhone") ?? ""),

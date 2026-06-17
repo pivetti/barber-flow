@@ -102,16 +102,7 @@ const Home = async () => {
             </div>
           </div>
 
-          <div className="mt-8 text-center">
-            <h1 className="text-2xl font-bold leading-tight text-white sm:text-3xl">
-              Reserve seu horario
-            </h1>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-              Complete uma etapa por vez e confirme no resumo.
-            </p>
-          </div>
-
-          <div className="mx-auto mt-8 w-full max-w-md">
+          <div className="mx-auto mt-6 w-full max-w-md">
             <HomeScheduleButton />
           </div>
         </section>

@@ -107,7 +107,7 @@ const BookingEditPage = async ({ params, searchParams }: BookingEditPageProps) =
       <AdminHeader adminName={admin.name} adminRole={admin.role} />
 
       <main className="mx-auto w-full max-w-5xl px-4 py-7 sm:px-6 sm:py-8">
-        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgba(17,17,132,0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
+        <section className="rounded-3xl border border-zinc-800/60 bg-[radial-gradient(circle_at_top,rgb(var(--brand-background-rgb)_/_0.12),transparent_42%),linear-gradient(to_bottom,rgba(24,24,27,0.96),rgba(9,9,11,0.92))] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.34)] sm:p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0 space-y-1.5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-100/75">Edicao</p>
