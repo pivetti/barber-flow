@@ -119,8 +119,6 @@ export const updateSiteSettings = async (formData: FormData) => {
 
   const settingsData = {
     ...parsed.data,
-    businessDescription:
-      parsed.data.businessDescription || defaultSiteSettings.businessDescription,
     logoUrl: parsed.data.logoUrl || defaultSiteSettings.logoUrl,
     bannerUrl: parsed.data.bannerUrl || defaultSiteSettings.bannerUrl,
   }
