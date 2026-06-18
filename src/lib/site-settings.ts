@@ -1,5 +1,6 @@
 import "server-only"
 import { businessConfig } from "@/config/business"
+import { defaultThemeColors, legacyThemeColors } from "@/config/theme"
 import { db } from "@/lib/prisma"
 
 export const SITE_SETTINGS_ID = "default"
@@ -12,10 +13,10 @@ export const defaultSiteSettings = {
     "Agendamentos online para uma experiencia simples, organizada e premium.",
   logoUrl: "/logo-jesi.png",
   bannerUrl: "/banner-jesi.png",
-  primaryColor: "#111184",
-  secondaryColor: "#1b1ba3",
-  accentColor: "#c7cbff",
-  backgroundGradientColor: "#111184",
+  primaryColor: defaultThemeColors.primary,
+  secondaryColor: defaultThemeColors.secondary,
+  accentColor: defaultThemeColors.accent,
+  backgroundGradientColor: defaultThemeColors.backgroundGradient,
   businessEmail: businessConfig.businessEmail,
   businessPhone: businessConfig.businessPhone,
   whatsappPhone: "",
@@ -37,6 +38,12 @@ export const normalizeHexColor = (value: string, fallback: string) => {
   }
 
   return fallback
+}
+
+const normalizeThemeColor = (value: string, fallback: string, legacyValue: string) => {
+  const normalized = normalizeHexColor(value, fallback)
+
+  return normalized === legacyValue.toUpperCase() ? fallback : normalized
 }
 
 export const hexToRgbParts = (value: string) => {
@@ -67,10 +74,26 @@ export const serializeSiteSettings = (settings: PublicSiteSettings): PublicSiteS
   businessDescription: settings.businessDescription,
   logoUrl: settings.logoUrl,
   bannerUrl: settings.bannerUrl,
-  primaryColor: settings.primaryColor,
-  secondaryColor: settings.secondaryColor,
-  accentColor: settings.accentColor,
-  backgroundGradientColor: settings.backgroundGradientColor,
+  primaryColor: normalizeThemeColor(
+    settings.primaryColor,
+    defaultThemeColors.primary,
+    legacyThemeColors.primary,
+  ),
+  secondaryColor: normalizeThemeColor(
+    settings.secondaryColor,
+    defaultThemeColors.secondary,
+    legacyThemeColors.secondary,
+  ),
+  accentColor: normalizeThemeColor(
+    settings.accentColor,
+    defaultThemeColors.accent,
+    legacyThemeColors.accent,
+  ),
+  backgroundGradientColor: normalizeThemeColor(
+    settings.backgroundGradientColor,
+    defaultThemeColors.backgroundGradient,
+    legacyThemeColors.backgroundGradient,
+  ),
   businessEmail: settings.businessEmail,
   businessPhone: settings.businessPhone,
   whatsappPhone: settings.whatsappPhone,

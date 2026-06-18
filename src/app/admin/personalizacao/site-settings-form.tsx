@@ -7,6 +7,7 @@ import { Check, Loader2, Palette, Save } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { defaultThemeColors } from "@/config/theme"
 import { updateSiteSettings } from "@/features/admin/actions/site-settings"
 import { cn } from "@/lib/utils"
 
@@ -55,10 +56,10 @@ const getColorInputValue = (value: string, fallback: string) => {
   return /^#[0-9A-Fa-f]{6}$/.test(value) ? value : fallback
 }
 
-const DEFAULT_PRIMARY_COLOR = "#111184"
-const DEFAULT_SECONDARY_COLOR = "#1B1BA3"
-const DEFAULT_ACCENT_COLOR = "#C7CBFF"
-const DEFAULT_BACKGROUND_GRADIENT_COLOR = "#111184"
+const DEFAULT_PRIMARY_COLOR = defaultThemeColors.primary
+const DEFAULT_SECONDARY_COLOR = defaultThemeColors.secondary
+const DEFAULT_ACCENT_COLOR = defaultThemeColors.accent
+const DEFAULT_BACKGROUND_GRADIENT_COLOR = defaultThemeColors.backgroundGradient
 
 const createSettingsFormData = (settings: SiteSettingsFormState) => {
   const formData = new FormData()

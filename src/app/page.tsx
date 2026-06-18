@@ -1,4 +1,3 @@
-import { MapPinIcon } from "lucide-react"
 import Image from "next/image"
 import Header from "@/components/header"
 import HomeScheduleButton from "@/components/home-schedule-button"
@@ -45,9 +44,8 @@ const Home = async () => {
     }),
   ])
 
-  const bannerUrl = getSafePublicImagePath(settings.bannerUrl, "/banner-jesi.png")
+  const heroLogoUrl = getSafePublicImagePath(settings.logoUrl, "/logo-jesi.png")
   const businessLocation = settings.businessLocation.trim()
-  const businessDescription = settings.businessDescription.trim()
   const serializedBarbers = barbers.map((barber) => ({
     id: barber.id,
     name: barber.name,
@@ -65,44 +63,40 @@ const Home = async () => {
   }))
 
   return (
-    <div className="bg-zinc-950">
+    <div className="home-shell">
       <Header />
 
-      <main className="w-full scroll-smooth bg-zinc-950">
-        <section className="mx-auto flex min-h-[calc(100svh-57px)] w-full max-w-3xl flex-col px-5 pb-12 pt-14 sm:px-6 md:min-h-[calc(100svh-61px)] md:pt-16">
-          <div className="mx-auto w-full max-w-md overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/45 shadow-2xl shadow-black/25">
-            <div className="relative aspect-[16/9] w-full bg-zinc-900">
-              <Image
-                alt="Ambiente da barbearia"
-                src={bannerUrl}
-                fill
-                priority
-                sizes="(max-width: 640px) calc(100vw - 2.5rem), 448px"
-                className="object-cover"
-              />
+      <main className="w-full scroll-smooth bg-transparent">
+        <section className="mx-auto flex min-h-[calc(100svh-65px)] w-full max-w-xl flex-col px-5 pb-6 pt-5 md:max-w-3xl md:px-6 md:pb-8 md:pt-6">
+          <div className="relative h-[clamp(344px,52svh,468px)] w-full overflow-hidden rounded-[1.75rem] border border-brand/15 bg-[#030303] shadow-[0_24px_64px_-54px_rgba(0,0,0,0.9)]">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgb(var(--brand-primary-rgb)_/_0.16),transparent_29%),radial-gradient(circle_at_50%_46%,rgb(var(--brand-secondary-rgb)_/_0.16),transparent_50%),linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.24)_48%,rgba(0,0,0,0.95)_100%)]" />
+            <div className="absolute inset-x-0 top-6 flex h-[64%] justify-center px-8">
+              <div className="relative aspect-square w-[min(58vw,248px)]">
+                <Image
+                  alt=""
+                  src={heroLogoUrl}
+                  fill
+                  priority
+                  aria-hidden="true"
+                  sizes="(max-width: 640px) 58vw, 248px"
+                  className="object-contain opacity-95 drop-shadow-[0_28px_55px_rgba(0,0,0,0.72)]"
+                />
+              </div>
             </div>
-
-            <div className="space-y-3 p-4">
-              <h2 className="text-xl font-bold leading-tight text-zinc-50">
+            <div className="absolute inset-x-0 bottom-0 px-6 pb-8 pt-32 md:px-8 md:pb-9">
+              <h1 className="max-w-[18rem] break-words text-[1.75rem] font-semibold leading-[1.08] tracking-normal text-zinc-50 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
                 {settings.businessName}
-              </h2>
+              </h1>
 
               {businessLocation && (
-                <p className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-                  <MapPinIcon className="h-4 w-4 shrink-0 text-brand-100" />
-                  <span>{businessLocation}</span>
-                </p>
-              )}
-
-              {businessDescription && (
-                <p className="text-sm leading-relaxed text-zinc-300">
-                  {businessDescription}
+                <p className="mt-3 max-w-[18rem] break-words text-sm font-medium leading-relaxed text-zinc-300/75">
+                  {businessLocation}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="mx-auto mt-6 w-full max-w-md">
+          <div className="mt-7 w-full">
             <HomeScheduleButton />
           </div>
         </section>
