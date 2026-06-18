@@ -60,22 +60,23 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgb(var(--brand-background-rgb)_/_0.16),transparent_40%),linear-gradient(to_bottom,#09090b,#18181b_58%,#09090b)] text-zinc-50">
       <Header />
-      <main className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
-        <section className="mx-auto w-full max-w-2xl rounded-3xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.42)] sm:p-6">
+      <main className="mx-auto flex min-h-[calc(100svh-57px)] w-full max-w-6xl flex-col justify-center px-3 py-4 sm:px-6 sm:py-8">
+        <section className="mx-auto w-full max-w-md rounded-2xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-4 shadow-[0_18px_46px_rgba(0,0,0,0.36)] sm:max-w-2xl sm:p-5">
           <div className="flex flex-col items-center text-center">
-            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-400/35 bg-emerald-500/15 text-emerald-200 shadow-[0_0_32px_rgba(16,185,129,0.16)]">
-              <Check className="h-7 w-7" />
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-emerald-400/35 bg-emerald-500/15 text-emerald-200 shadow-[0_0_28px_rgba(16,185,129,0.16)]">
+              <Check className="h-5 w-5" />
             </span>
-            <h1 className="mt-4 text-2xl font-semibold leading-tight text-zinc-50 md:text-3xl">
+            <h1 className="mt-3 text-xl font-semibold leading-tight text-zinc-50 md:text-2xl">
               Agendamento confirmado
             </h1>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-zinc-300">
+            <p className="mt-1.5 max-w-lg text-xs leading-relaxed text-zinc-300 sm:text-sm">
               {booking.customerName}, seu horario foi reservado com sucesso.
             </p>
           </div>
 
-          <div className="mt-6 rounded-2xl border border-zinc-800/70 bg-zinc-900/45 p-3">
+          <div className="mt-4 rounded-2xl border border-zinc-800/70 bg-zinc-900/45 p-2.5">
             <CustomerBookingSummaryGrid
+              compact
               items={[
                 {
                   icon: "service",
@@ -101,7 +102,7 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
             />
           </div>
 
-          <div className="mt-5">
+          <div className="mt-4">
             <ConfirmedBookingActions
               bookingId={booking.id}
               canCancel={booking.status === "SCHEDULED"}
@@ -112,7 +113,7 @@ const ConfirmedBookingPage = async ({ searchParams }: ConfirmedBookingPageProps)
 
         </section>
 
-        <footer className="mx-auto mt-4 w-full max-w-2xl text-center text-xs leading-relaxed text-zinc-600">
+        <footer className="mx-auto mt-3 w-full max-w-2xl text-center text-[11px] leading-relaxed text-zinc-600">
           Guarde este comprovante para consultar os dados do seu agendamento.
           <br />
           <Link

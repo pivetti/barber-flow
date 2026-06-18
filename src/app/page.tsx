@@ -67,37 +67,39 @@ const Home = async () => {
       <Header />
 
       <main className="w-full scroll-smooth bg-transparent">
-        <section className="mx-auto flex min-h-[calc(100svh-65px)] w-full max-w-xl flex-col px-5 pb-6 pt-5 md:max-w-3xl md:px-6 md:pb-8 md:pt-6">
-          <div className="relative h-[clamp(344px,52svh,468px)] w-full overflow-hidden rounded-[1.75rem] border border-brand/15 bg-[#030303] shadow-[0_24px_64px_-54px_rgba(0,0,0,0.9)]">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgb(var(--brand-primary-rgb)_/_0.16),transparent_29%),radial-gradient(circle_at_50%_46%,rgb(var(--brand-secondary-rgb)_/_0.16),transparent_50%),linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.24)_48%,rgba(0,0,0,0.95)_100%)]" />
-            <div className="absolute inset-x-0 top-6 flex h-[64%] justify-center px-8">
-              <div className="relative aspect-square w-[min(58vw,248px)]">
-                <Image
-                  alt=""
-                  src={heroLogoUrl}
-                  fill
-                  priority
-                  aria-hidden="true"
-                  sizes="(max-width: 640px) 58vw, 248px"
-                  className="object-contain opacity-95 drop-shadow-[0_28px_55px_rgba(0,0,0,0.72)]"
-                />
+        <section className="mx-auto flex min-h-[calc(100svh-65px)] w-full max-w-xl flex-col justify-center px-5 py-6 md:max-w-3xl md:px-6 md:py-8">
+          <div className="w-full">
+            <div className="relative h-[clamp(344px,52svh,468px)] w-full overflow-hidden rounded-[1.75rem] border border-brand/15 bg-[#030303] shadow-[0_24px_64px_-54px_rgba(0,0,0,0.9)]">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgb(var(--brand-primary-rgb)_/_0.16),transparent_29%),radial-gradient(circle_at_50%_46%,rgb(var(--brand-secondary-rgb)_/_0.16),transparent_50%),linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.24)_48%,rgba(0,0,0,0.95)_100%)]" />
+              <div className="absolute inset-x-0 top-6 flex h-[64%] justify-center px-8">
+                <div className="relative aspect-square w-[min(58vw,248px)]">
+                  <Image
+                    alt=""
+                    src={heroLogoUrl}
+                    fill
+                    priority
+                    aria-hidden="true"
+                    sizes="(max-width: 640px) 58vw, 248px"
+                    className="object-contain opacity-95 drop-shadow-[0_28px_55px_rgba(0,0,0,0.72)]"
+                  />
+                </div>
+              </div>
+              <div className="absolute inset-x-0 bottom-0 px-6 pb-8 pt-32 md:px-8 md:pb-9">
+                <h1 className="max-w-[18rem] break-words text-[1.75rem] font-semibold leading-[1.08] tracking-normal text-zinc-50 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
+                  {settings.businessName}
+                </h1>
+
+                {businessLocation && (
+                  <p className="mt-3 max-w-[18rem] break-words text-sm font-medium leading-relaxed text-zinc-300/75">
+                    {businessLocation}
+                  </p>
+                )}
               </div>
             </div>
-            <div className="absolute inset-x-0 bottom-0 px-6 pb-8 pt-32 md:px-8 md:pb-9">
-              <h1 className="max-w-[18rem] break-words text-[1.75rem] font-semibold leading-[1.08] tracking-normal text-zinc-50 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
-                {settings.businessName}
-              </h1>
 
-              {businessLocation && (
-                <p className="mt-3 max-w-[18rem] break-words text-sm font-medium leading-relaxed text-zinc-300/75">
-                  {businessLocation}
-                </p>
-              )}
+            <div className="mt-7 w-full">
+              <HomeScheduleButton />
             </div>
-          </div>
-
-          <div className="mt-7 w-full">
-            <HomeScheduleButton />
           </div>
         </section>
 

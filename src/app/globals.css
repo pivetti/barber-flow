@@ -82,6 +82,10 @@
       #000;
   }
 
+  body:has(.admin-login-page) footer {
+    display: none;
+  }
+
   [id^="booking-"] {
     scroll-margin-top: 6rem;
   }

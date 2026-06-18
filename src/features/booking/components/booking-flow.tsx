@@ -199,12 +199,22 @@ const getPreferredScrollBehavior = (): ScrollBehavior => {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
 }
 
-const scrollToElement = (elementId: string) => {
+const scrollToElement = (elementId: string, shouldFocus = false) => {
   window.requestAnimationFrame(() => {
-    document.getElementById(elementId)?.scrollIntoView({
+    const element = document.getElementById(elementId)
+
+    if (!element) {
+      return
+    }
+
+    element.scrollIntoView({
       behavior: getPreferredScrollBehavior(),
       block: "start",
     })
+
+    if (shouldFocus) {
+      element.focus({ preventScroll: true })
+    }
   })
 }
 
@@ -596,7 +606,11 @@ const DateTimeStep = ({
       </p>
     ) : (
       <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
-        <div className="rounded-lg border border-zinc-800 bg-zinc-950/35 p-3">
+        <div
+          id="booking-time-slots"
+          tabIndex={-1}
+          className="scroll-mt-24 rounded-lg border border-zinc-800 bg-zinc-950/35 p-3 outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+        >
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-100">
             <CalendarDays className="h-4 w-4 text-brand-100" />
             Escolha a data
@@ -1112,6 +1126,7 @@ const BookingFlow = ({
 
     if (day) {
       setDayContextStatus("loading")
+      scrollToElement("booking-time-slots", true)
       return
     }
 

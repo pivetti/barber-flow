@@ -15,9 +15,9 @@ const AdminLoginPage = ({ searchParams }: AdminLoginPageProps) => {
   })
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgb(var(--brand-background-rgb)_/_0.18),transparent_38%),linear-gradient(to_bottom,#09090b,#18181b_55%,#09090b)] text-zinc-50">
+    <div className="admin-login-page h-[100svh] overflow-hidden bg-[radial-gradient(circle_at_top,rgb(var(--brand-background-rgb)_/_0.18),transparent_38%),linear-gradient(to_bottom,#09090b,#18181b_55%,#09090b)] text-zinc-50">
       <Header />
-      <main className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center px-4 py-10 sm:px-6 sm:py-14">
+      <main className="mx-auto flex h-[calc(100svh-57px)] w-full max-w-6xl items-center px-4 py-4 sm:px-6">
         <section className="mx-auto w-full max-w-md rounded-3xl border border-zinc-800/70 bg-[linear-gradient(145deg,rgba(24,24,27,0.94),rgba(9,9,11,0.92))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.42)] sm:p-6">
           <div className="mb-5 inline-flex rounded-full border border-brand/35 bg-brand/12 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-100">
             Area administrativa

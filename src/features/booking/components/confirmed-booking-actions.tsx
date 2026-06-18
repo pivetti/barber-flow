@@ -103,7 +103,7 @@ const ConfirmedBookingActions = ({
           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-brand/40 bg-brand/12 px-4 text-sm font-semibold text-brand-100 transition-colors hover:bg-brand/20"
         >
           <Plus className="h-4 w-4" />
-          Agendar outro horario
+          Agendar mais um horario
         </Link>
 
         <Dialog open={open} onOpenChange={setOpen}>
